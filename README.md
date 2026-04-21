@@ -38,6 +38,17 @@ Check with `node -v` and `npm -v`.
 
 ## Installation
 
+### Claude Code
+
+Run the following command in your terminal:
+
+```bash
+claude mcp add --transport stdio avenia \
+  --env AVENIA_API_KEY=your-api-key-here \
+  --env AVENIA_ENV=sandbox \
+  -- npx -y @avenia/mcp-client
+```
+
 ### Cursor
 
 One-click install:
@@ -59,17 +70,6 @@ After installation, set your API key in `~/.cursor/mcp.json`:
     }
   }
 }
-```
-
-### Claude Code
-
-Run the following command in your terminal:
-
-```bash
-claude mcp add --transport stdio avenia \
-  --env AVENIA_API_KEY=your-api-key-here \
-  --env AVENIA_ENV=sandbox \
-  -- npx -y @avenia/mcp-client
 ```
 
 ### Claude Desktop
