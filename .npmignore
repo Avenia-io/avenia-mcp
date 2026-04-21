@@ -1,0 +1,13 @@
+src/
+.github/
+.vscode/
+.env*
+tsconfig.json
+tsconfig.*.json
+*.test.ts
+vitest.config.ts
+scripts/
+Dockerfile
+.dockerignore
+.gitignore
+coverage/
