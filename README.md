@@ -1,47 +1,50 @@
-# Avenia MCP
+<h1>Avenia MCP Server<img src="./assets/logo.png" align="right" width="102"/></h1>
 
-Official Model Context Protocol server for the [Avenia public API](https://api-reference.avenia.io). Plug your AI assistant (Claude Code, Cursor, Zed, Claude Desktop, or any MCP-compatible client) into the Avenia platform and start orchestrating payments, KYC, quotes, beneficiaries, sub-accounts, webhooks and more — without writing a line of integration code.
+[![npm version](https://img.shields.io/npm/v/@avenia/mcp-client.svg)](https://www.npmjs.com/package/@avenia/mcp-client)
+[![docs](https://img.shields.io/badge/docs-api--reference.avenia.io-0a0a0a)](https://api-reference.avenia.io)
+[![license](https://img.shields.io/npm/l/@avenia/mcp-client.svg)](LICENSE)
 
-92 tools, one per API endpoint. Generated directly from the Avenia OpenAPI spec so it stays in lockstep with the platform.
+The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless liquidity infrastructure connecting LatAm to the world.
 
-## Install
+## What This MCP Server Does
 
-### npx (recommended — zero install)
+This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 92 tools — one per public API endpoint — that let an assistant:
 
-```bash
-claude mcp add avenia -- npx -y @avenia/mcp-client
-```
+- Create and manage **sub-accounts** and **accesses** for your organization
+- Move money via **tickets**: Pix pay-ins, PIX / wire pay-outs, FX conversions, and on-chain stablecoin transfers
+- Get **fixed-rate quotes** with full markup-fee control (BRL, USD, EUR, ARS, USDC, USDT, BRZ, and more)
+- Manage **beneficiaries**: wallets + BRL / USD / EUR / ARS bank accounts
+- Run **KYC** flows (Level 1 API, Web SDK, W8-BEN) and track attempts
+- Handle **documents**, **webhooks** (register / update / delete / inspect delivery attempts), and **email notifications**
+- Administer **API keys** with programmatic rotation
 
-### Global install
+Full list: run `listTools` from any MCP client once connected, or see the [API reference](https://api-reference.avenia.io).
 
-```bash
-npm install -g @avenia/mcp-client
-claude mcp add avenia -- avenia-mcp
-```
+## Prerequisites
 
-### Docker
+**Get your API key:**
 
-```bash
-claude mcp add avenia -- docker run --rm -i \
-  -e AVENIA_API_KEY \
-  -e AVENIA_ENV \
-  ghcr.io/avenia-tech/avenia-mcp:latest
-```
+1. [Create an account on Avenia](https://app.avenia.io/sign-up)
+2. Complete KYC and pick your environment (sandbox or production)
+3. Open the dashboard, go to **Settings → API Keys**, and create a new key
+4. Copy the key — you won't be able to see it again
 
-## Configure
+**Dependencies you need to have installed:**
 
-Set your credentials and target environment via environment variables:
+- [Node.js](https://nodejs.org/en/download) (v20 or newer)
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `AVENIA_API_KEY` | ✓ (or bearer token) | — | API key from the Avenia portal. Sent as `X-API-Key`. |
-| `AVENIA_BEARER_TOKEN` | ✓ (or API key) | — | JWT from a login flow. Sent as `Authorization: Bearer`. |
-| `AVENIA_ENV` | | `sandbox` | `sandbox` or `production`. |
-| `AVENIA_API_BASE_URL` | | derived | Override the base URL (advanced). |
-| `AVENIA_TIMEOUT_MS` | | `60000` | HTTP timeout per request. |
-| `AVENIA_LOG_LEVEL` | | `info` | `silent` / `error` / `info` / `debug`. Logs go to stderr. |
+Check with `node -v` and `npm -v`.
 
-Minimal `~/.claude/settings.json` example:
+## Installation
+
+### Cursor
+
+One-click install:
+
+[Add MCP to Cursor](https://cursor.com/en-US/install-mcp?name=avenia&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBhdmVuaWEvbWNwLWNsaWVudCJdLCJlbnYiOnsiQVZFTklBX0FQSV9LRVkiOiJ5b3VyLWFwaS1rZXktaGVyZSIsIkFWRU5JQV9FTlYiOiJzYW5kYm94In19)
+
+After installation, set your API key in `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -50,7 +53,7 @@ Minimal `~/.claude/settings.json` example:
       "command": "npx",
       "args": ["-y", "@avenia/mcp-client"],
       "env": {
-        "AVENIA_API_KEY": "av_sandbox_...",
+        "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
       }
     }
@@ -58,94 +61,120 @@ Minimal `~/.claude/settings.json` example:
 }
 ```
 
-## What you can do
+### Claude Code
 
-Once connected, ask your assistant in natural language:
-
-- *"List my BRL bank account beneficiaries"* → `avenia_get_beneficiary_brl_bank_accounts`
-- *"Quote a BRL→USDC conversion for R$ 10,000 via Pix"* → `avenia_get_fixed_rate_quote`
-- *"Create a ticket to send 500 USDC on Polygon to beneficiary wallet X"* → `avenia_create_ticket`
-- *"Show me all tickets created in the last 7 days"* → `avenia_get_tickets`
-- *"Register a webhook at https://mysite.com/hook for ticket updates"* → `avenia_register_webhook`
-- *"Create a sub-account for customer John Doe"* → `avenia_create_sub_account`
-- *"What's my KYC status and what's still pending?"* → `avenia_get_attempts` + `avenia_get_access_info`
-
-### Endpoint coverage
-
-| Area | Tools | Notes |
-|---|---|---|
-| Account | balances, limits, statement, metadata, access-info, account-info | Per-account and per-sub-account |
-| Sub-accounts | create, list, get | |
-| Beneficiaries | wallets + bank accounts (BRL / USD / EUR / ARS) | create / list / get / delete |
-| Quotes | fixed-rate | Full markup fee control |
-| Tickets | create, list, get, receipt | On-ramps, off-ramps, conversions, on-chain sends |
-| Payment sessions | create, list, get, preferences, fixed-quote, ticket | Public + private flows |
-| Pix | BRL fiat rail, Pix key lookup, static BR Code | |
-| KYC | Level 1 API & Web SDK, W8-BEN, attempts, import-token | |
-| Documents | upload, list, get | |
-| Auth & accesses | create account, login, MFA TOTP, accesses CRUD, API keys CRUD | |
-| Webhooks | register / update / delete / events / delivery attempts | 12 tools |
-| Notifications | email config (get/upsert) | |
-| Public key | fetch JWE/JWS key | For sensitive payload encryption |
-
-Run `listTools` from any MCP client to see the full, live catalog.
-
-## Authentication
-
-Two ways:
-
-### 1. API key (recommended for server-to-server / AI assistants)
-
-Generate one at the Avenia portal and export:
+Run the following command in your terminal:
 
 ```bash
-export AVENIA_API_KEY=av_live_...
-export AVENIA_ENV=production
+claude mcp add --transport stdio avenia \
+  --env AVENIA_API_KEY=your-api-key-here \
+  --env AVENIA_ENV=sandbox \
+  -- npx -y @avenia/mcp-client
 ```
 
-All tools use this key via the `X-API-Key` header.
+### Claude Desktop
 
-### 2. Bearer token (short-lived JWT)
+Add to your Claude Desktop configuration file:
 
-Already have a JWT from a user login flow? Pass it in `AVENIA_BEARER_TOKEN`. The MCP will use `Authorization: Bearer <token>`.
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-If both are set, **`AVENIA_API_KEY` wins**.
+```json
+{
+  "mcpServers": {
+    "avenia": {
+      "command": "npx",
+      "args": ["-y", "@avenia/mcp-client"],
+      "env": {
+        "AVENIA_API_KEY": "your-api-key-here",
+        "AVENIA_ENV": "sandbox"
+      }
+    }
+  }
+}
+```
 
-### Running the login flow from within the MCP
-
-The MCP exposes `avenia_login_step_1` + `avenia_validate_login_step_2` + `avenia_refresh_token` as tools. You can log in through an MCP client by chaining them, then feed the resulting access token back in via `AVENIA_BEARER_TOKEN` on restart. A stateful session variant is on the roadmap.
-
-## Development
+### Codex
 
 ```bash
-git clone https://github.com/avenia-tech/avenia-mcp
-cd avenia-mcp
-npm install
-npm run build
-npm test
+codex mcp add avenia \
+  --env AVENIA_API_KEY=your-api-key-here \
+  --env AVENIA_ENV=sandbox \
+  -- npx -y @avenia/mcp-client
 ```
 
-### Regenerating the tool catalog
+Or add to `~/.codex/config.toml`:
 
-The tool table in `src/tools.ts` is generated from the Avenia OpenAPI spec. To refresh after an API change:
+```toml
+[mcp_servers.avenia]
+command = "npx"
+args = ["-y", "@avenia/mcp-client"]
+
+[mcp_servers.avenia.env]
+AVENIA_API_KEY = "your-api-key-here"
+AVENIA_ENV = "sandbox"
+```
+
+### Docker
 
 ```bash
-curl -s https://api-reference.avenia.io/openapi.json -o /tmp/avenia-openapi.json
-python3 scripts/gen_tools.py
-npm run build
+docker run --rm -i \
+  -e AVENIA_API_KEY=your-api-key-here \
+  -e AVENIA_ENV=sandbox \
+  ghcr.io/avenia-tech/avenia-mcp:latest
 ```
 
-### Local smoke test
+## Environment Variables
 
-```bash
-AVENIA_API_KEY=av_sandbox_... \
-AVENIA_ENV=sandbox \
-AVENIA_LOG_LEVEL=debug \
-node dist/index.js < /dev/null
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `AVENIA_API_KEY` | ✓ | — | API key from the Avenia dashboard. Sent as `X-API-Key`. |
+| `AVENIA_BEARER_TOKEN` | alt. | — | Short-lived JWT from a login flow. Sent as `Authorization: Bearer`. |
+| `AVENIA_ENV` | | `sandbox` | `sandbox` or `production`. |
+| `AVENIA_API_BASE_URL` | | derived | Override the base URL (advanced). |
+| `AVENIA_TIMEOUT_MS` | | `60000` | Per-request HTTP timeout. |
+| `AVENIA_LOG_LEVEL` | | `info` | `silent` / `error` / `info` / `debug` — logs go to stderr. |
+
+## Example Prompts
+
+Once configured, ask your AI assistant:
+
+```
+"Get me a fixed-rate quote for sending R$ 10,000 via Pix to USDC on Polygon"
+
+"List all tickets from the last 7 days that are still pending"
+
+"Create a BRL beneficiary named 'Fornecedor ACME' with Pix key contato@acme.com.br"
+
+"Show me my current balances and daily limits"
+
+"Register a webhook at https://mysite.com/hook for TICKET events"
+
+"Create a sub-account for customer João Silva and send me the sub-account ID"
+
+"What's the KYC status of sub-account sub_xxxxxxxx and what's still pending?"
 ```
 
-The server waits on stdin for JSON-RPC. Point an MCP inspector at it, or wire it into Claude Code with `claude mcp add avenia-local -- node $(pwd)/dist/index.js`.
+> [!TIP]
+> Use `AVENIA_ENV=sandbox` while testing. Everything runs against [sandbox.avenia.io](https://api.sandbox.avenia.io:10952/v2) — no real money, no real customers. Switch to `production` only when you're ready.
+
+> [!NOTE]
+> Sub-account operations accept `subAccountId` as a parameter on most tools. If your assistant doesn't pick it up automatically, mention it explicitly in your prompt (e.g. "…for sub-account sub_abc123…").
+
+## Documentation
+
+- [API Reference](https://api-reference.avenia.io) — full endpoint docs with request/response schemas
+- [Integration Guide](https://api-reference.avenia.io/quickstart) — concepts: tickets, quotes, payment methods, KYC levels
+- [MCP Protocol](https://modelcontextprotocol.io/) — how the underlying protocol works
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/avenia-tech/avenia-mcp/issues)
+- **Email**: [developers@avenia.io](mailto:developers@avenia.io)
+- **Status**: [status.avenia.io](https://status.avenia.io)
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+This project is licensed under the [MIT License](LICENSE).
+
+Made with ♥ by the [Avenia](https://avenia.io) team.
