@@ -2,13 +2,28 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  ReadResourceRequestSchema,
   type CallToolResult,
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { apiRequest, type HttpMethod } from "./client.js";
 import { config, logger } from "./config.js";
 import { AveniaApiError, MissingCredentialError } from "./errors.js";
+import {
+  listGuideResources,
+  readGuide,
+  resolveGuideUri,
+} from "./resources.js";
+import {
+  PROMPTS,
+  PROMPT_BY_NAME,
+  guideResourceLinks,
+  renderPromptBody,
+} from "./prompts.js";
 import { TOOLS, type ToolDefinition } from "./tools.js";
 
 const PKG_NAME = "avenia-mcp";
@@ -70,15 +85,15 @@ function errorToResult(err: unknown): CallToolResult {
 }
 
 async function main() {
-  // Touch config early — catches malformed AVENIA_ENV at boot.
   const cfg = config();
   const log = logger();
 
   const server = new Server(
     { name: PKG_NAME, version: PKG_VERSION },
-    { capabilities: { tools: {} } }
+    { capabilities: { tools: {}, resources: {}, prompts: {} } }
   );
 
+  // ---- tools ----
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS.map((t) => ({
       name: t.name,
@@ -101,11 +116,80 @@ async function main() {
     }
   });
 
+  // ---- resources (integration guides) ----
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: listGuideResources(),
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
+    const uri = req.params.uri;
+    const guide = resolveGuideUri(uri);
+    if (!guide) {
+      throw new Error(`Unknown resource URI: ${uri}`);
+    }
+    try {
+      const body = await readGuide(guide);
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "text/markdown",
+            text: body,
+          },
+        ],
+      };
+    } catch (err) {
+      log.error(`resource ${uri} fetch failed:`, err instanceof Error ? err.message : String(err));
+      throw err;
+    }
+  });
+
+  // ---- prompts (flow templates) ----
+  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+    prompts: PROMPTS.map((p) => ({
+      name: p.name,
+      description: p.description,
+      arguments: p.arguments.map((a) => ({
+        name: a.name,
+        description: a.description,
+        required: a.required ?? false,
+      })),
+    })),
+  }));
+
+  server.setRequestHandler(GetPromptRequestSchema, async (req) => {
+    const prompt = PROMPT_BY_NAME.get(req.params.name);
+    if (!prompt) {
+      throw new Error(`Unknown prompt: ${req.params.name}`);
+    }
+    const args = (req.params.arguments ?? {}) as Record<string, string | undefined>;
+    const body = renderPromptBody(prompt.template, args);
+    const links = guideResourceLinks(prompt.guideIds);
+
+    const linksBlock =
+      links.length > 0
+        ? `\n\nReference guides (resources you can read via resources/read):\n` +
+          links.map((l) => `- \`${l.uri}\` — ${l.name} — ${l.description}`).join("\n")
+        : "";
+
+    return {
+      description: prompt.description,
+      messages: [
+        {
+          role: "user" as const,
+          content: { type: "text" as const, text: body + linksBlock },
+        },
+      ],
+    };
+  });
+
+  // ---- transport ----
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
   log.info(
-    `started ${PKG_NAME}@${PKG_VERSION} env=${cfg.env} base=${cfg.baseURL} tools=${TOOLS.length}` +
+    `started ${PKG_NAME}@${PKG_VERSION} env=${cfg.env} base=${cfg.baseURL} ` +
+      `tools=${TOOLS.length} resources=${listGuideResources().length} prompts=${PROMPTS.length}` +
       (cfg.apiKey ? " auth=api-key" : cfg.bearerToken ? " auth=bearer" : " auth=NONE")
   );
 }

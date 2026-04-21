@@ -161,6 +161,39 @@ Once configured, ask your AI assistant:
 > [!NOTE]
 > Sub-account operations accept `subAccountId` as a parameter on most tools. If your assistant doesn't pick it up automatically, mention it explicitly in your prompt (e.g. "…for sub-account sub_abc123…").
 
+## Flows & Guides
+
+Beyond the 92 tools, the server exposes two more MCP primitives so assistants can run real integration flows end-to-end:
+
+### Prompts (ready-made flows)
+
+Nine curated prompts map the most common integrations to a step-by-step plan. In Claude Code, Claude Desktop and Cursor these appear as slash commands (e.g. `/avenia_flow_pix_to_stablecoin_onchain`). Each takes typed arguments and returns a message the assistant can execute directly.
+
+| Prompt | What it does |
+|---|---|
+| `avenia_flow_pix_to_stablecoin_onchain` | Accept Pix in BRL → convert to USDC/USDT → send on-chain to an external wallet |
+| `avenia_flow_stablecoin_to_pix` | Spend a stablecoin balance → pay out via Pix to a BRL beneficiary |
+| `avenia_flow_kyc_level_1` | Submit individual KYC L1 (API or Web SDK) and poll to approval |
+| `avenia_flow_kyb_level_1_api` | Business KYB Level 1 via API |
+| `avenia_flow_create_api_key` | Create an API key safely (MFA + JWE with the platform public key) |
+| `avenia_flow_register_webhook` | Register a webhook + verify the first delivery signature |
+| `avenia_flow_sandbox_mock_funds` | Credit mock Pix funds in sandbox for testing |
+| `avenia_flow_create_subaccount_with_kyc` | Create a sub-account and run KYC/KYB on it |
+| `avenia_flow_payout_brcode` | Pay a dynamic Pix BR Code (copia-e-cola) |
+
+### Resources (integration-guide docs)
+
+Every page of the [Integration Guide](https://integration-guide.avenia.io) is exposed as an MCP resource at `avenia-guide://<id>`. The assistant can list all 36 guides via `resources/list` and read any of them on demand via `resources/read`. The server fetches the live page, strips navigation chrome, and returns clean markdown — always up-to-date with the docs site, no stale bundled copies.
+
+Representative guides (see `resources/list` for the full catalog):
+
+- `avenia-guide://operations-quotes-and-tickets` — how quotes become tickets
+- `avenia-guide://operations-combinations` — valid currency × payment-method combos
+- `avenia-guide://usecase-pix2stable-onchain` — Pix → stablecoin → on-chain
+- `avenia-guide://webhooks-verifying-authenticity` — verifying webhook signatures with the platform public key
+- `avenia-guide://security-api-keys-management` — API key lifecycle with JWE
+- `avenia-guide://kyc-level-1` / `avenia-guide://kyb-level-1-api` — identity verification flows
+
 ## Documentation
 
 - [API Reference](https://api-reference.avenia.io) — full endpoint docs with request/response schemas
