@@ -1,5 +1,5 @@
 {
-  "name": "@avenia/mcp-client",
+  "name": "@avenia-io/mcp-client",
   "version": "0.1.0",
   "description": "Official MCP server for the Avenia public API. Connect Claude Code, Cursor, Zed, and other MCP clients to the Avenia platform.",
   "type": "module",
@@ -35,9 +35,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avenia-tech/avenia-mcp.git"
+    "url": "git+https://github.com/Avenia-io/avenia-mcp.git"
   },
   "homepage": "https://api-reference.avenia.io",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
@@ -45,6 +49,10 @@
     "@modelcontextprotocol/sdk": "^1.10.0",
     "undici": "^6.21.0",
     "zod": "^3.23.8"
+  },
+  "overrides": {
+    "hono": "^4.12.18",
+    "ip-address": "^10.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.7.0",

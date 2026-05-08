@@ -52,7 +52,7 @@ Read the \`avenia-guide://usecase-pix2stable-onchain\` resource first for the au
     description: "Reverse on-ramp: spend stablecoin balance and pay out via Pix to a BRL beneficiary.",
     arguments: [
       { name: "amountStable", description: "Stablecoin amount to convert (e.g. 500).", required: true },
-      { name: "inputCurrency", description: "Source stablecoin (USDC, USDT, BRZ). Default: USDC." },
+      { name: "inputCurrency", description: "Source stablecoin (USDC, USDT, BRLA). Default: USDC." },
       { name: "pixKey", description: "Destination Pix key (CPF/CNPJ/email/phone/random).", required: true },
       ARG_SUBACCOUNT,
     ],
@@ -98,29 +98,6 @@ Read \`avenia-guide://kyc-level-1\` for the exact required fields and document f
     template: `Run KYB Level 1 programmatically{{#subAccountId}} for sub-account {{subAccountId}}{{/subAccountId}}.
 
 Walk the user through the flow per \`avenia-guide://kyb-level-1-api\`: collect legal entity data, uploaded documents, UBO declarations, then submit and poll for approval. If USD or EUR operations will be needed, also reference \`avenia-guide://kyb-usd\` or \`avenia-guide://kyb-eur\` for the additional requirements.`,
-  },
-  {
-    name: "avenia_flow_create_api_key",
-    description: "Create an Avenia API key safely using MFA + JWE encryption of the returned secret.",
-    arguments: [
-      { name: "keyName", description: "Human-readable key name (e.g. \"staging-backend\").", required: true },
-      {
-        name: "permissions",
-        description: "Comma-separated permission flags (payIn,payOut,convert,onChain,viewOnly).",
-        required: true,
-      },
-    ],
-    guideIds: ["security-api-keys-management", "security-api-keys-guide", "security-mfa"],
-    template: `Create a new Avenia API key named "{{keyName}}" with permissions: {{permissions}}.
-
-Steps:
-1. Ensure MFA (TOTP) is enrolled on the account — see \`avenia-guide://security-mfa\`. If not, run \`avenia_create_mfa_totp\` and \`avenia_validate_mfa_totp\` first.
-2. Fetch the platform public key (\`avenia_get_public_key\`) to encrypt sensitive fields using JWE as described in \`avenia-guide://security-api-keys-management\`.
-3. Call \`avenia_create_api_key\` with the encrypted payload.
-4. Capture the returned plaintext key **once** — it won't be shown again.
-5. Confirm via \`avenia_get_api_keys\`.
-
-Never print the plaintext API key back into chat history that may be logged.`,
   },
   {
     name: "avenia_flow_register_webhook",

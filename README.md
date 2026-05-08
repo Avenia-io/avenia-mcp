@@ -1,18 +1,20 @@
 <h1>Avenia MCP Server<img src="./assets/logo.png" align="right" width="102"/></h1>
 
-[![npm version](https://img.shields.io/npm/v/@avenia/mcp-client.svg)](https://www.npmjs.com/package/@avenia/mcp-client)
+![status](https://img.shields.io/badge/status-internal--preview-orange)
 [![docs](https://img.shields.io/badge/docs-api--reference.avenia.io-0a0a0a)](https://api-reference.avenia.io)
-[![license](https://img.shields.io/npm/l/@avenia/mcp-client.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless liquidity infrastructure connecting LatAm to the world.
 
+> **Internal preview.** This package is hosted on a **private GitHub Packages registry** under the `Avenia-io` organization. Access is gated by GitHub Personal Access Tokens. Only authorized team members can install it.
+
 ## What This MCP Server Does
 
-This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 92 tools — one per public API endpoint — that let an assistant:
+This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 68 tools — one per public API endpoint — that let an assistant:
 
 - Create and manage **sub-accounts** and **accesses** for your organization
 - Move money via **tickets**: Pix pay-ins, PIX / wire pay-outs, FX conversions, and on-chain stablecoin transfers
-- Get **fixed-rate quotes** with full markup-fee control (BRL, USD, EUR, ARS, USDC, USDT, BRZ, and more)
+- Get **fixed-rate quotes** with full markup-fee control (BRL, USD, EUR, ARS, USDC, USDT, BRLA, and more)
 - Manage **beneficiaries**: wallets + BRL / USD / EUR / ARS bank accounts
 - Run **KYC** flows (Level 1 API, Web SDK, W8-BEN) and track attempts
 - Handle **documents**, **webhooks** (register / update / delete / inspect delivery attempts), and **email notifications**
@@ -22,7 +24,7 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 
 ## Prerequisites
 
-**Get your API key:**
+**Get your Avenia API key:**
 
 1. [Create an account on Avenia](https://app.avenia.io/sign-up)
 2. Complete KYC and pick your environment (sandbox or production)
@@ -31,10 +33,32 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 
 **Dependencies you need to have installed:**
 
-- [Node.js](https://nodejs.org/en/download) (v20 or newer)
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [Node.js](https://nodejs.org/en/download) (v20 or newer) — check with `node -v`
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) — check with `npm -v`
 
-Check with `node -v` and `npm -v`.
+**Get a GitHub PAT for the private registry:**
+
+The package currently lives on GitHub Packages under the `Avenia-io` org and is private. Each user installing it needs a Personal Access Token with `read:packages` scope. _(When the package is later promoted to the public npm registry, this whole PAT setup becomes unnecessary — `npx -y @avenia-io/mcp-client` will just work.)_
+
+1. Open [GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)](https://github.com/settings/tokens)
+2. Click **Generate new token (classic)**, give it a name (e.g. `avenia-mcp-install`)
+3. Tick the **`read:packages`** scope (only this scope is needed to install)
+4. Generate, copy the `ghp_…` token
+
+Configure your global `~/.npmrc` so any npm/npx command can pull from the Avenia-io registry:
+
+```bash
+cat >> ~/.npmrc <<'EOF'
+@avenia-io:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=ghp_REPLACE_ME
+EOF
+```
+
+Verify access:
+
+```bash
+npm view @avenia-io/mcp-client version
+```
 
 ## Installation
 
@@ -46,23 +70,19 @@ Run the following command in your terminal:
 claude mcp add --transport stdio avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- npx -y @avenia/mcp-client
+  -- npx -y @avenia-io/mcp-client
 ```
 
 ### Cursor
 
-One-click install:
-
-[Add MCP to Cursor](https://cursor.com/en-US/install-mcp?name=avenia&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBhdmVuaWEvbWNwLWNsaWVudCJdLCJlbnYiOnsiQVZFTklBX0FQSV9LRVkiOiJ5b3VyLWFwaS1rZXktaGVyZSIsIkFWRU5JQV9FTlYiOiJzYW5kYm94In19)
-
-After installation, set your API key in `~/.cursor/mcp.json`:
+Add to `~/.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "avenia": {
       "command": "npx",
-      "args": ["-y", "@avenia/mcp-client"],
+      "args": ["-y", "@avenia-io/mcp-client"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -84,7 +104,7 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "avenia": {
       "command": "npx",
-      "args": ["-y", "@avenia/mcp-client"],
+      "args": ["-y", "@avenia-io/mcp-client"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -100,7 +120,7 @@ Add to your Claude Desktop configuration file:
 codex mcp add avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- npx -y @avenia/mcp-client
+  -- npx -y @avenia-io/mcp-client
 ```
 
 Or add to `~/.codex/config.toml`:
@@ -108,21 +128,15 @@ Or add to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.avenia]
 command = "npx"
-args = ["-y", "@avenia/mcp-client"]
+args = ["-y", "@avenia-io/mcp-client"]
 
 [mcp_servers.avenia.env]
 AVENIA_API_KEY = "your-api-key-here"
 AVENIA_ENV = "sandbox"
 ```
 
-### Docker
-
-```bash
-docker run --rm -i \
-  -e AVENIA_API_KEY=your-api-key-here \
-  -e AVENIA_ENV=sandbox \
-  ghcr.io/avenia-tech/avenia-mcp:latest
-```
+> [!NOTE]
+> All install methods rely on `~/.npmrc` having the GitHub Packages credentials configured (see Prerequisites). Without that, `npx` will fail with `404 Not Found` because the package is private.
 
 ## Environment Variables
 
@@ -163,11 +177,11 @@ Once configured, ask your AI assistant:
 
 ## Flows & Guides
 
-Beyond the 92 tools, the server exposes two more MCP primitives so assistants can run real integration flows end-to-end:
+Beyond the 68 tools, the server exposes two more MCP primitives so assistants can run real integration flows end-to-end:
 
 ### Prompts (ready-made flows)
 
-Nine curated prompts map the most common integrations to a step-by-step plan. In Claude Code, Claude Desktop and Cursor these appear as slash commands (e.g. `/avenia_flow_pix_to_stablecoin_onchain`). Each takes typed arguments and returns a message the assistant can execute directly.
+Eight curated prompts map the most common integrations to a step-by-step plan. In Claude Code, Claude Desktop and Cursor these appear as slash commands (e.g. `/avenia_flow_pix_to_stablecoin_onchain`). Each takes typed arguments and returns a message the assistant can execute directly.
 
 | Prompt | What it does |
 |---|---|
@@ -175,7 +189,6 @@ Nine curated prompts map the most common integrations to a step-by-step plan. In
 | `avenia_flow_stablecoin_to_pix` | Spend a stablecoin balance → pay out via Pix to a BRL beneficiary |
 | `avenia_flow_kyc_level_1` | Submit individual KYC L1 (API or Web SDK) and poll to approval |
 | `avenia_flow_kyb_level_1_api` | Business KYB Level 1 via API |
-| `avenia_flow_create_api_key` | Create an API key safely (MFA + JWE with the platform public key) |
 | `avenia_flow_register_webhook` | Register a webhook + verify the first delivery signature |
 | `avenia_flow_sandbox_mock_funds` | Credit mock Pix funds in sandbox for testing |
 | `avenia_flow_create_subaccount_with_kyc` | Create a sub-account and run KYC/KYB on it |
@@ -202,7 +215,7 @@ Representative guides (see `resources/list` for the full catalog):
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/avenia-tech/avenia-mcp/issues)
+- **Issues**: [GitHub Issues](https://github.com/Avenia-io/avenia-mcp/issues)
 - **Email**: [developers@avenia.io](mailto:developers@avenia.io)
 - **Status**: [status.avenia.io](https://status.avenia.io)
 
