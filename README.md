@@ -1,12 +1,12 @@
 <h1>Avenia MCP Server<img src="./assets/logo.png" align="right" width="102"/></h1>
 
-![status](https://img.shields.io/badge/status-internal--preview-orange)
+![status](https://img.shields.io/badge/status-preview-orange)
 [![docs](https://img.shields.io/badge/docs-api--reference.avenia.io-0a0a0a)](https://api-reference.avenia.io)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless liquidity infrastructure connecting LatAm to the world.
 
-> **Internal preview.** This package is hosted on a **private GitHub Packages registry** under the `Avenia-io` organization. Access is gated by GitHub Personal Access Tokens. Only authorized team members can install it.
+> **Preview.** Install is currently from source (clone + build). An npm release will come once the API surface is stable.
 
 ## What This MCP Server Does
 
@@ -35,42 +35,37 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 
 - [Node.js](https://nodejs.org/en/download) (v20 or newer) — check with `node -v`
 - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) — check with `npm -v`
-
-**Get a GitHub PAT for the private registry:**
-
-The package currently lives on GitHub Packages under the `Avenia-io` org and is private. Each user installing it needs a Personal Access Token with `read:packages` scope. _(When the package is later promoted to the public npm registry, this whole PAT setup becomes unnecessary — `npx -y @avenia-io/mcp-client` will just work.)_
-
-1. Open [GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)](https://github.com/settings/tokens)
-2. Click **Generate new token (classic)**, give it a name (e.g. `avenia-mcp-install`)
-3. Tick the **`read:packages`** scope (only this scope is needed to install)
-4. Generate, copy the `ghp_…` token
-
-Configure your global `~/.npmrc` so any npm/npx command can pull from the Avenia-io registry:
-
-```bash
-cat >> ~/.npmrc <<'EOF'
-@avenia-io:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=ghp_REPLACE_ME
-EOF
-```
-
-Verify access:
-
-```bash
-npm view @avenia-io/mcp-client version
-```
+- [git](https://git-scm.com/downloads) — check with `git --version`
 
 ## Installation
 
+Clone, install dependencies and build once:
+
+```bash
+git clone https://github.com/Avenia-io/avenia-mcp.git
+cd avenia-mcp
+npm install
+npm run build
+```
+
+This produces `dist/index.js`, which is the executable entrypoint your MCP client will spawn. Note the **absolute path** to that file — every config below points to it.
+
+```bash
+# from inside the cloned repo
+echo "$(pwd)/dist/index.js"
+```
+
+When you pull updates later, re-run `npm install && npm run build`.
+
 ### Claude Code
 
-Run the following command in your terminal:
+From any directory:
 
 ```bash
 claude mcp add --transport stdio avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- npx -y @avenia-io/mcp-client
+  -- node /absolute/path/to/avenia-mcp/dist/index.js
 ```
 
 ### Cursor
@@ -81,8 +76,8 @@ Add to `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "avenia": {
-      "command": "npx",
-      "args": ["-y", "@avenia-io/mcp-client"],
+      "command": "node",
+      "args": ["/absolute/path/to/avenia-mcp/dist/index.js"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -103,8 +98,8 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "avenia": {
-      "command": "npx",
-      "args": ["-y", "@avenia-io/mcp-client"],
+      "command": "node",
+      "args": ["/absolute/path/to/avenia-mcp/dist/index.js"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -120,15 +115,15 @@ Add to your Claude Desktop configuration file:
 codex mcp add avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- npx -y @avenia-io/mcp-client
+  -- node /absolute/path/to/avenia-mcp/dist/index.js
 ```
 
 Or add to `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.avenia]
-command = "npx"
-args = ["-y", "@avenia-io/mcp-client"]
+command = "node"
+args = ["/absolute/path/to/avenia-mcp/dist/index.js"]
 
 [mcp_servers.avenia.env]
 AVENIA_API_KEY = "your-api-key-here"
@@ -136,7 +131,7 @@ AVENIA_ENV = "sandbox"
 ```
 
 > [!NOTE]
-> All install methods rely on `~/.npmrc` having the GitHub Packages credentials configured (see Prerequisites). Without that, `npx` will fail with `404 Not Found` because the package is private.
+> Replace `/absolute/path/to/avenia-mcp/dist/index.js` with the real path printed by `echo "$(pwd)/dist/index.js"` above. Relative paths and `~` are not expanded by most MCP clients.
 
 ## Environment Variables
 

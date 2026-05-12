@@ -39,10 +39,6 @@
     "url": "git+https://github.com/Avenia-io/avenia-mcp.git"
   },
   "homepage": "https://api-reference.avenia.io",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "public"
-  },
   "engines": {
     "node": ">=20.0.0"
   },
