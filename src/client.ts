@@ -32,7 +32,7 @@ export async function apiRequest<T = unknown>(
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    "User-Agent": "avenia-mcp/0.1.0",
+    "User-Agent": "avenia-mcp/0.1.2",
     ...(opts.headers ?? {}),
   };
 

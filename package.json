@@ -1,12 +1,13 @@
 {
   "name": "@avenia-io/mcp-client",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Official MCP server for the Avenia public API. Connect Claude Code, Cursor, Zed, and other MCP clients to the Avenia platform.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "avenia-mcp": "dist/index.js"
+    "avenia-mcp": "dist/index.js",
+    "mcp-client": "dist/index.js"
   },
   "files": [
     "dist/**",

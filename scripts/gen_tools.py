@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Generate src/tools.ts from the Avenia OpenAPI spec."""
-import json, re, sys, collections
+import json, os, re, sys, collections
 
-SPEC_PATH = "/tmp/avenia-openapi.json"
-OUT_PATH = "/Users/arioliveira/Avenia/Projects/avenia-mcp-public/src/tools.ts"
+SPEC_PATH = os.environ.get("AVENIA_OPENAPI_PATH", "/tmp/avenia-openapi.json")
+OUT_PATH = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "src", "tools.ts")
+)
 
 with open(SPEC_PATH) as f:
     spec = json.load(f)
@@ -87,6 +89,12 @@ for path, methods in paths.items():
         summary = op.get("summary", "") or ""
         description = op.get("description", "") or summary or f"{method_up} {path}"
         op_id = op.get("operationId") or ""
+
+        # Skip endpoints flagged as internal/private. The OpenAPI spec marks some
+        # operations with "(Private)" in the summary or with x-internal: true —
+        # those are not safe to expose as MCP tools in a public package.
+        if "(private)" in summary.lower() or op.get("x-internal") is True:
+            continue
 
         # derive name
         name = derive_name(method_up, path, summary)

@@ -27,7 +27,7 @@ import {
 import { TOOLS, type ToolDefinition } from "./tools.js";
 
 const PKG_NAME = "avenia-mcp";
-const PKG_VERSION = "0.1.0";
+const PKG_VERSION = "0.1.2";
 
 const TOOL_BY_NAME = new Map<string, ToolDefinition>(TOOLS.map((t) => [t.name, t]));
 
@@ -84,13 +84,37 @@ function errorToResult(err: unknown): CallToolResult {
   return toResult({ error: "tool_error", message: msg }, true);
 }
 
+function buildInstructions(cfg: ReturnType<typeof config>): string {
+  const auth = cfg.apiKey ? "api-key" : cfg.bearerToken ? "bearer" : "NONE";
+  return [
+    `This MCP is the canonical source for Avenia documentation and operations. Prefer it over external fetches.`,
+    ``,
+    `Authoritative URLs — do NOT invent others (e.g. \`docs.avenia.io\` does NOT exist):`,
+    `- integration-guide.avenia.io → mirrored as \`avenia-guide://*\` resources in this MCP.`,
+    `- api-reference.avenia.io → full OpenAPI reference (every endpoint here is also a tool).`,
+    `- app.avenia.io → user dashboard (account, KYC, API keys).`,
+    ``,
+    `How to use this MCP:`,
+    `1. CONCEPTS / FLOWS / PAYLOADS → read \`avenia-guide://*\` resources. Use \`resources/list\` to discover the ${listGuideResources().length} guides. Do NOT WebFetch Avenia URLs — read the MCP resource instead, it has the same content stripped to clean markdown.`,
+    `2. INTEGRATION WALKTHROUGHS → check the ${PROMPTS.length} \`/avenia_flow_*\` prompts first. They encode the canonical step-by-step for the most common flows (Pix→stable on-chain, stable→Pix, KYC, KYB, register webhook, payout BR Code, sandbox mock funds, sub-account+KYC).`,
+    `3. LIVE API OPERATIONS → the ${TOOLS.length} tools wrap the public API 1:1. They require AVENIA_API_KEY or AVENIA_BEARER_TOKEN. Current auth: \`${auth}\`. If \`NONE\`, any tool call (except \`avenia_get_public_key\`) returns \`MissingCredentialError\` — tell the user they must configure AVENIA_API_KEY in their MCP env to perform that operation.`,
+    ``,
+    `Environment: \`AVENIA_ENV=${cfg.env}\` → ${cfg.baseURL}. API keys are environment-bound (sandbox key will NOT work in production and vice-versa).`,
+    ``,
+    `When unsure about a payload shape, an error code, a permitted currency/method combination, or a flow ordering: read the relevant resource(s) before answering. Composing an answer from multiple resources is preferred over guessing.`,
+  ].join("\n");
+}
+
 async function main() {
   const cfg = config();
   const log = logger();
 
   const server = new Server(
     { name: PKG_NAME, version: PKG_VERSION },
-    { capabilities: { tools: {}, resources: {}, prompts: {} } }
+    {
+      capabilities: { tools: {}, resources: {}, prompts: {} },
+      instructions: buildInstructions(cfg),
+    }
   );
 
   // ---- tools ----

@@ -46,7 +46,7 @@ export async function readGuide(guide: Guide): Promise<string> {
 
   const res = await request(guide.url, {
     method: "GET",
-    headers: { "User-Agent": "avenia-mcp/0.1.0", Accept: "text/html" },
+    headers: { "User-Agent": "avenia-mcp/0.1.2", Accept: "text/html" },
     headersTimeout: config().timeoutMs,
     bodyTimeout: config().timeoutMs,
     maxRedirections: 5,

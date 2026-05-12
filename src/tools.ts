@@ -18,31 +18,6 @@ export interface ToolDefinition {
 
 export const TOOLS: readonly ToolDefinition[] = [
   {
-    "name": "avenia_account_get_payment_session_by_id_private",
-    "description": "Get Payment Session by ID (Private)",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "payment-session-id": {
-          "type": "string",
-          "description": "ID of the payment session"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "payment-session-id"
-      ]
-    },
-    "method": "GET",
-    "pathTemplate": "/v2/account/payment-sessions/{payment-session-id}",
-    "pathParams": [
-      "payment-session-id"
-    ],
-    "queryParams": [],
-    "bodyUnwrap": false,
-    "skipAuth": false
-  },
-            {
     "name": "avenia_create_beneficiary_ars_bank_account",
     "description": "Create Beneficiary ARS Bank Account",
     "inputSchema": {
@@ -1608,31 +1583,6 @@ export const TOOLS: readonly ToolDefinition[] = [
     },
     "method": "GET",
     "pathTemplate": "/v2/payment-session/{payment-session-id}",
-    "pathParams": [
-      "payment-session-id"
-    ],
-    "queryParams": [],
-    "bodyUnwrap": false,
-    "skipAuth": false
-  },
-  {
-    "name": "avenia_get_payment_session_by_id_private",
-    "description": "Get Payment Session by ID (Private)",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "payment-session-id": {
-          "type": "string",
-          "description": "ID of the payment session"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "payment-session-id"
-      ]
-    },
-    "method": "GET",
-    "pathTemplate": "/v2/account/payment-session/{payment-session-id}",
     "pathParams": [
       "payment-session-id"
     ],
