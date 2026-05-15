@@ -92,7 +92,7 @@ function buildInstructions(cfg: ReturnType<typeof config>): string {
     `Authoritative URLs — do NOT invent others (e.g. \`docs.avenia.io\` does NOT exist):`,
     `- integration-guide.avenia.io → mirrored as \`avenia-guide://*\` resources in this MCP.`,
     `- api-reference.avenia.io → full OpenAPI reference (every endpoint here is also a tool).`,
-    `- app.avenia.io → user dashboard (account, KYC, API keys).`,
+    `- app.avenia.io → user dashboard (account, KYC).`,
     ``,
     `How to use this MCP:`,
     `1. CONCEPTS / FLOWS / PAYLOADS → read \`avenia-guide://*\` resources. Use \`resources/list\` to discover the ${listGuideResources().length} guides. Do NOT WebFetch Avenia URLs — read the MCP resource instead, it has the same content stripped to clean markdown.`,

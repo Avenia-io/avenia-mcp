@@ -18,7 +18,6 @@ This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex,
 - Manage **beneficiaries**: wallets + BRL / USD / EUR / ARS bank accounts
 - Run **KYC** flows (Level 1 API, Web SDK, W8-BEN) and track attempts
 - Handle **documents**, **webhooks** (register / update / delete / inspect delivery attempts), and **email notifications**
-- Administer **API keys** with programmatic rotation
 
 Full list: run `listTools` from any MCP client once connected, or see the [API reference](https://api-reference.avenia.io).
 
@@ -28,8 +27,8 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 
 1. [Create an account on Avenia](https://app.avenia.io/sign-up)
 2. Complete KYC and pick your environment (sandbox or production)
-3. Open the dashboard, go to **Settings → API Keys**, and create a new key
-4. Copy the key — you won't be able to see it again
+3. Request an API key from Avenia at [developers@avenia.io](mailto:developers@avenia.io), specifying the environment (sandbox or production). API keys for v2 are provisioned by Avenia — they are not self-serve from the dashboard.
+4. Store the key securely — it is issued once.
 
 **Dependencies you need to have installed:**
 
@@ -137,7 +136,7 @@ AVENIA_ENV = "sandbox"
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `AVENIA_API_KEY` | ✓ | — | API key from the Avenia dashboard. Sent as `X-API-Key`. |
+| `AVENIA_API_KEY` | ✓ | — | API key provisioned by Avenia (request at developers@avenia.io). Sent as `X-API-Key`. |
 | `AVENIA_BEARER_TOKEN` | alt. | — | Short-lived JWT from a login flow. Sent as `Authorization: Bearer`. |
 | `AVENIA_ENV` | | `sandbox` | `sandbox` or `production`. |
 | `AVENIA_API_BASE_URL` | | derived | Override the base URL (advanced). |
@@ -199,7 +198,6 @@ Representative guides (see `resources/list` for the full catalog):
 - `avenia-guide://operations-combinations` — valid currency × payment-method combos
 - `avenia-guide://usecase-pix2stable-onchain` — Pix → stablecoin → on-chain
 - `avenia-guide://webhooks-verifying-authenticity` — verifying webhook signatures with the platform public key
-- `avenia-guide://security-api-keys-management` — API key lifecycle with JWE
 - `avenia-guide://kyc-level-1` / `avenia-guide://kyb-level-1-api` — identity verification flows
 
 ## Documentation

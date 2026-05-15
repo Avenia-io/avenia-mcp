@@ -230,14 +230,7 @@ export const GUIDES: readonly Guide[] = [
     title: "API Keys — How They Work",
     category: "Security",
     url: "https://integration-guide.avenia.io/docs/Security/apiKeysGuide",
-    summary: "Scopes, rotation and security considerations for Avenia API keys.",
-  },
-  {
-    id: "security-api-keys-management",
-    title: "API Keys — Management",
-    category: "Security",
-    url: "https://integration-guide.avenia.io/docs/Security/apiKeysManagements",
-    summary: "Create, list, update and revoke API keys (uses JWE with the platform public key).",
+    summary: "Scopes and security considerations for Avenia API keys. Note: API keys are provisioned by Avenia (developers@avenia.io), not self-serve from the dashboard.",
   },
   {
     id: "security-mfa",
