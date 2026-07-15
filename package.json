@@ -1,6 +1,6 @@
 {
   "name": "@avenia-io/mcp-client",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Official MCP server for the Avenia public API. Connect Claude Code, Cursor, Zed, and other MCP clients to the Avenia platform.",
   "type": "module",
   "main": "dist/index.js",
@@ -12,8 +12,13 @@
   "files": [
     "dist/**",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --target node20 --clean --dts && node -e \"const f=require('fs'),p='dist/index.js';f.writeFileSync(p,'#!/usr/bin/env node\\n'+f.readFileSync(p,'utf8'));f.chmodSync(p,0o755)\"",
     "dev": "tsx src/index.ts",

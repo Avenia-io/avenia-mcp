@@ -1,6 +1,7 @@
 import { request } from "undici";
 import { GUIDES, GUIDE_BY_ID, type Guide } from "./guides.js";
 import { config, logger } from "./config.js";
+import { USER_AGENT } from "./version.js";
 
 /** MCP resource URI scheme for guides: avenia-guide://<id> */
 export const GUIDE_URI_PREFIX = "avenia-guide://";
@@ -46,7 +47,7 @@ export async function readGuide(guide: Guide): Promise<string> {
 
   const res = await request(guide.url, {
     method: "GET",
-    headers: { "User-Agent": "avenia-mcp/0.1.2", Accept: "text/html" },
+    headers: { "User-Agent": USER_AGENT, Accept: "text/html" },
     headersTimeout: config().timeoutMs,
     bodyTimeout: config().timeoutMs,
     maxRedirections: 5,
