@@ -67,7 +67,26 @@ export async function apiRequest<T = unknown>(
     bodyTimeout: timeoutMs,
   });
 
-  const text = await res.body.text();
+  // Read the body as bytes so binary responses (e.g. ticket receipt / contract
+  // PDFs) survive intact. Decoding binary as UTF-8 text corrupts it (invalid
+  // sequences become U+FFFD), which made `avenia_get_ticket_receipt` return a
+  // broken PDF. For binary content-types we return the bytes as base64 instead.
+  const contentType = String(res.headers["content-type"] ?? "");
+  const buf = Buffer.from(await res.body.arrayBuffer());
+  const isBinary =
+    /application\/(pdf|octet-stream)|^(image|audio|video)\//.test(contentType) ||
+    (buf.length >= 5 && buf.subarray(0, 5).toString("latin1") === "%PDF-");
+
+  if (res.statusCode < 400 && isBinary) {
+    log.debug(`← ${res.statusCode} ${method} ${url.pathname} (binary ${contentType || "?"})`);
+    return {
+      contentType: contentType || "application/pdf",
+      base64: buf.toString("base64"),
+      byteLength: buf.length,
+    } as T;
+  }
+
+  const text = buf.toString("utf8");
   const parsed = text ? safeJson(text) : null;
 
   if (res.statusCode >= 400) {
