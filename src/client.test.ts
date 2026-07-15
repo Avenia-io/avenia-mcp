@@ -4,10 +4,18 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 const requestMock = vi.fn();
 vi.mock("undici", () => ({ request: (...args: unknown[]) => requestMock(...args) }));
 
-function fakeResponse(statusCode: number, body: unknown) {
+// Mimics a real undici response closely enough for either client.ts variant:
+// text-based (`body.text()`) and binary-aware (`headers["content-type"]` +
+// `body.arrayBuffer()`).
+function fakeResponse(statusCode: number, body: unknown, contentType = "application/json") {
+  const text = typeof body === "string" ? body : JSON.stringify(body);
   return {
     statusCode,
-    body: { text: async () => (typeof body === "string" ? body : JSON.stringify(body)) },
+    headers: { "content-type": contentType },
+    body: {
+      text: async () => text,
+      arrayBuffer: async () => new TextEncoder().encode(text).buffer,
+    },
   };
 }
 
