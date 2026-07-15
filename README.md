@@ -6,11 +6,11 @@
 
 The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless liquidity infrastructure connecting LatAm to the world.
 
-> **Preview.** Install is currently from source (clone + build). An npm release will come once the API surface is stable.
+> Install with a single `npx` command — no clone or build step. Defaults to **sandbox**; switch to production only when you're ready.
 
 ## What This MCP Server Does
 
-This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 68 tools — one per public API endpoint — that let an assistant:
+This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 66 tools — one per public API endpoint — that let an assistant:
 
 - Create and manage **sub-accounts** and **accesses** for your organization
 - Move money via **tickets**: Pix pay-ins, PIX / wire pay-outs, FX conversions, and on-chain stablecoin transfers
@@ -31,41 +31,22 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 3. Open the dashboard, go to **Settings → API Keys**, and create a new key
 4. Copy the key — you won't be able to see it again
 
-**Dependencies you need to have installed:**
+**Dependencies:**
 
-- [Node.js](https://nodejs.org/en/download) (v20 or newer) — check with `node -v`
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) — check with `npm -v`
-- [git](https://git-scm.com/downloads) — check with `git --version`
+- [Node.js](https://nodejs.org/en/download) v20 or newer (`node -v`) — ships with `npx`, which is all you need for the install below. `git` is only required if you build from source.
 
 ## Installation
 
-Clone, install dependencies and build once:
-
-```bash
-git clone https://github.com/Avenia-io/avenia-mcp.git
-cd avenia-mcp
-npm install
-npm run build
-```
-
-This produces `dist/index.js`, which is the executable entrypoint your MCP client will spawn. Note the **absolute path** to that file — every config below points to it.
-
-```bash
-# from inside the cloned repo
-echo "$(pwd)/dist/index.js"
-```
-
-When you pull updates later, re-run `npm install && npm run build`.
+No install step — your MCP client runs the server on demand with `npx`. All configs below use
+`npx -y @avenia-io/mcp-client`; set `AVENIA_API_KEY` and (optionally) `AVENIA_ENV` in the env.
 
 ### Claude Code
-
-From any directory:
 
 ```bash
 claude mcp add --transport stdio avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- node /absolute/path/to/avenia-mcp/dist/index.js
+  -- npx -y @avenia-io/mcp-client
 ```
 
 ### Cursor
@@ -76,8 +57,8 @@ Add to `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "avenia": {
-      "command": "node",
-      "args": ["/absolute/path/to/avenia-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@avenia-io/mcp-client"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -98,8 +79,8 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "avenia": {
-      "command": "node",
-      "args": ["/absolute/path/to/avenia-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@avenia-io/mcp-client"],
       "env": {
         "AVENIA_API_KEY": "your-api-key-here",
         "AVENIA_ENV": "sandbox"
@@ -115,23 +96,37 @@ Add to your Claude Desktop configuration file:
 codex mcp add avenia \
   --env AVENIA_API_KEY=your-api-key-here \
   --env AVENIA_ENV=sandbox \
-  -- node /absolute/path/to/avenia-mcp/dist/index.js
+  -- npx -y @avenia-io/mcp-client
 ```
 
 Or add to `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.avenia]
-command = "node"
-args = ["/absolute/path/to/avenia-mcp/dist/index.js"]
+command = "npx"
+args = ["-y", "@avenia-io/mcp-client"]
 
 [mcp_servers.avenia.env]
 AVENIA_API_KEY = "your-api-key-here"
 AVENIA_ENV = "sandbox"
 ```
 
-> [!NOTE]
-> Replace `/absolute/path/to/avenia-mcp/dist/index.js` with the real path printed by `echo "$(pwd)/dist/index.js"` above. Relative paths and `~` are not expanded by most MCP clients.
+> [!TIP]
+> `npx -y @avenia-io/mcp-client` always fetches the latest published version. Pin a specific version with `@avenia-io/mcp-client@x.y.z`.
+
+<details>
+<summary><strong>From source (for contributors)</strong></summary>
+
+```bash
+git clone https://github.com/Avenia-io/avenia-mcp.git
+cd avenia-mcp
+npm install
+npm run build
+```
+
+Then point your client at the built entrypoint: replace `npx -y @avenia-io/mcp-client` in any config above with `node /absolute/path/to/avenia-mcp/dist/index.js` (absolute path — `~` is not expanded by most MCP clients).
+
+</details>
 
 ## Environment Variables
 
@@ -172,7 +167,7 @@ Once configured, ask your AI assistant:
 
 ## Flows & Guides
 
-Beyond the 68 tools, the server exposes two more MCP primitives so assistants can run real integration flows end-to-end:
+Beyond the 66 tools, the server exposes two more MCP primitives so assistants can run real integration flows end-to-end:
 
 ### Prompts (ready-made flows)
 

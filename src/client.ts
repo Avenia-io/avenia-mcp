@@ -1,6 +1,7 @@
 import { request } from "undici";
 import { config, logger } from "./config.js";
 import { AveniaApiError, MissingCredentialError } from "./errors.js";
+import { USER_AGENT } from "./version.js";
 
 export type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
@@ -32,7 +33,7 @@ export async function apiRequest<T = unknown>(
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    "User-Agent": "avenia-mcp/0.1.2",
+    "User-Agent": USER_AGENT,
     ...(opts.headers ?? {}),
   };
 

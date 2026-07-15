@@ -25,9 +25,7 @@ import {
   renderPromptBody,
 } from "./prompts.js";
 import { TOOLS, type ToolDefinition } from "./tools.js";
-
-const PKG_NAME = "avenia-mcp";
-const PKG_VERSION = "0.1.2";
+import { SERVER_NAME as PKG_NAME, VERSION as PKG_VERSION } from "./version.js";
 
 const TOOL_BY_NAME = new Map<string, ToolDefinition>(TOOLS.map((t) => [t.name, t]));
 
