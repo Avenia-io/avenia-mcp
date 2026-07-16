@@ -27,6 +27,7 @@ import {
   renderPromptBody,
 } from "./prompts.js";
 import { TOOLS, type ToolDefinition } from "./tools.js";
+import { DOCS_TOOLS, DOCS_TOOL_BY_NAME } from "./docsTools.js";
 import { SERVER_NAME as PKG_NAME, VERSION as PKG_VERSION } from "./version.js";
 
 const TOOL_BY_NAME = new Map<string, ToolDefinition>(TOOLS.map((t) => [t.name, t]));
@@ -138,18 +139,41 @@ function createMcpServer(cfg: ReturnType<typeof config>, publicReadOnly: boolean
     }
   );
 
-  const visibleTools = publicReadOnly ? TOOLS.filter((t) => t.skipAuth) : TOOLS;
+  const visibleApiTools = publicReadOnly ? TOOLS.filter((t) => t.skipAuth) : TOOLS;
 
   // ---- tools ----
+  // Docs tools (list/read guides & flows) are always exposed and read-only —
+  // tool-centric clients (claude.ai) don't surface resources/prompts, so the
+  // documentation is reachable via tools too.
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: visibleTools.map((t) => ({
-      name: t.name,
-      description: t.description,
-      inputSchema: t.inputSchema,
-    })),
+    tools: [
+      ...DOCS_TOOLS.map((t) => ({
+        name: t.name,
+        title: t.title,
+        description: t.description,
+        inputSchema: t.inputSchema,
+        annotations: { title: t.title, readOnlyHint: true },
+      })),
+      ...visibleApiTools.map((t) => ({
+        name: t.name,
+        description: t.description,
+        inputSchema: t.inputSchema,
+        // On the public endpoint only read-only API tools (get_public_key) are visible.
+        ...(publicReadOnly ? { annotations: { readOnlyHint: true } } : {}),
+      })),
+    ],
   }));
 
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
+    const docsTool = DOCS_TOOL_BY_NAME.get(req.params.name);
+    if (docsTool) {
+      try {
+        return await docsTool.handler((req.params.arguments ?? {}) as Record<string, unknown>);
+      } catch (err) {
+        log.error(`docs tool ${docsTool.name} failed:`, err instanceof Error ? err.message : String(err));
+        return errorToResult(err);
+      }
+    }
     const tool = TOOL_BY_NAME.get(req.params.name);
     if (!tool) {
       return toResult({ error: "unknown_tool", name: req.params.name }, true);
@@ -321,7 +345,7 @@ async function startHttp(cfg: ReturnType<typeof config>): Promise<void> {
     log.info(
       `started ${PKG_NAME}@${PKG_VERSION} transport=http port=${cfg.port} ` +
         `mode=${publicReadOnly ? "public-read-only" : "full"} ` +
-        `tools=${(publicReadOnly ? TOOLS.filter((t) => t.skipAuth) : TOOLS).length} ` +
+        `tools=${DOCS_TOOLS.length + (publicReadOnly ? TOOLS.filter((t) => t.skipAuth) : TOOLS).length} ` +
         `resources=${listGuideResources().length} prompts=${PROMPTS.length}`
     );
   });
@@ -335,7 +359,7 @@ async function startStdio(cfg: ReturnType<typeof config>): Promise<void> {
   await server.connect(transport);
   log.info(
     `started ${PKG_NAME}@${PKG_VERSION} transport=stdio env=${cfg.env} base=${cfg.baseURL} ` +
-      `tools=${TOOLS.length} resources=${listGuideResources().length} prompts=${PROMPTS.length}` +
+      `tools=${DOCS_TOOLS.length + TOOLS.length} resources=${listGuideResources().length} prompts=${PROMPTS.length}` +
       (cfg.apiKey ? " auth=api-key" : cfg.bearerToken ? " auth=bearer" : " auth=NONE")
   );
 }

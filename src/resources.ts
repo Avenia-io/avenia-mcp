@@ -1,4 +1,3 @@
-import { request } from "undici";
 import { GUIDES, GUIDE_BY_ID, type Guide } from "./guides.js";
 import { config, logger } from "./config.js";
 import { USER_AGENT } from "./version.js";
@@ -45,19 +44,20 @@ export async function readGuide(guide: Guide): Promise<string> {
   const log = logger();
   log.debug(`fetch guide ${guide.id} ← ${guide.url}`);
 
-  const res = await request(guide.url, {
+  // Native fetch follows redirects (guide URLs 301 to a trailing slash) without
+  // the bundling/redirect quirks of undici's request + maxRedirections.
+  const res = await fetch(guide.url, {
     method: "GET",
     headers: { "User-Agent": USER_AGENT, Accept: "text/html" },
-    headersTimeout: config().timeoutMs,
-    bodyTimeout: config().timeoutMs,
-    maxRedirections: 5,
+    redirect: "follow",
+    signal: AbortSignal.timeout(config().timeoutMs),
   });
 
-  if (res.statusCode >= 400) {
-    throw new Error(`Failed to fetch guide ${guide.id}: HTTP ${res.statusCode}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch guide ${guide.id}: HTTP ${res.status}`);
   }
 
-  const html = await res.body.text();
+  const html = await res.text();
   const extracted = extractArticle(html);
   const markdown = htmlToMarkdown(extracted);
 
