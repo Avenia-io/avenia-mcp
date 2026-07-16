@@ -5,7 +5,13 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
-## [0.3.0]
+## [0.3.1]
+
+### Added
+- **Docs tools** — `avenia_list_guides`, `avenia_read_guide`, `avenia_list_flows`, `avenia_get_flow`. The guides and flows were already exposed as MCP resources and prompts, but tool-centric clients (e.g. claude.ai connectors) don't surface those, so the same documentation is now reachable via read-only tools. Exposed on every transport, including the public read-only endpoint. All carry `title` + `readOnlyHint` annotations (also helps a future Connectors Directory submission).
+
+### Fixed
+- Reading a guide (the `avenia_read_guide` tool and the `avenia-guide://` resources) failed on the trailing-slash 301 that guide URLs issue. Switched the guide fetch from undici's `request`+`maxRedirections` to native `fetch`, which follows redirects reliably.
 
 ### Added
 - **Remote HTTP transport (Streamable HTTP).** Set `AVENIA_TRANSPORT=http` (with `PORT`, default 8080) to run as an HTTP server exposing `POST /mcp` and `GET /health`. Defaults to a **public read-only** mode: only the guides, the flow prompts and `avenia_get_public_key` are exposed; the credential-bearing tools are hidden and refuse to run — so no secrets ever touch a shared endpoint. Powers the hosted `mcp.avenia.io` docs endpoint. The default transport stays **stdio** (local/npx behaviour is unchanged). `AVENIA_HTTP_FULL=true` exposes all tools over HTTP for a trusted, non-public deployment.
