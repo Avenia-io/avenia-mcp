@@ -5,6 +5,11 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.3.0]
+
+### Added
+- **Remote HTTP transport (Streamable HTTP).** Set `AVENIA_TRANSPORT=http` (with `PORT`, default 8080) to run as an HTTP server exposing `POST /mcp` and `GET /health`. Defaults to a **public read-only** mode: only the guides, the flow prompts and `avenia_get_public_key` are exposed; the credential-bearing tools are hidden and refuse to run — so no secrets ever touch a shared endpoint. Powers the hosted `mcp.avenia.io` docs endpoint. The default transport stays **stdio** (local/npx behaviour is unchanged). `AVENIA_HTTP_FULL=true` exposes all tools over HTTP for a trusted, non-public deployment.
+
 ## [0.2.2]
 
 ### Added
