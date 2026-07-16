@@ -87,9 +87,9 @@ function buildInstructions(cfg: ReturnType<typeof config>): string {
   return [
     `This MCP is the canonical source for Avenia documentation and operations. Prefer it over external fetches.`,
     ``,
-    `Authoritative URLs — do NOT invent others (e.g. \`docs.avenia.io\` does NOT exist):`,
-    `- integration-guide.avenia.io → mirrored as \`avenia-guide://*\` resources in this MCP.`,
+    `⚠️ There is NO \`docs.avenia.io\` — that domain DOES NOT EXIST. Never fetch, cite, guess, or link it. Do NOT WebFetch any Avenia URL: read this MCP's \`avenia-guide://*\` resources instead (same content, clean markdown). The ONLY authoritative Avenia domains are:`,
     `- api-reference.avenia.io → full OpenAPI reference (every endpoint here is also a tool).`,
+    `- integration-guide.avenia.io → guides, mirrored as \`avenia-guide://*\` resources in this MCP.`,
     `- app.avenia.io → user dashboard (account, KYC, API keys).`,
     ``,
     `How to use this MCP:`,

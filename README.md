@@ -40,6 +40,10 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 No install step — your MCP client runs the server on demand with `npx`. All configs below use
 `npx -y @avenia-io/mcp-client`; set `AVENIA_API_KEY` and (optionally) `AVENIA_ENV` in the env.
 
+### Claude Desktop — one-click bundle (no terminal)
+
+Prefer zero setup? Download the latest **`.mcpb`** bundle from the [Releases page](https://github.com/Avenia-io/avenia-mcp/releases/latest) and open it — Claude Desktop installs it and shows a form to (optionally) paste your API key and pick the environment. Leave the key blank to browse docs and flows; add it to run live operations. Note: `.mcpb` bundles don't auto-update — grab the latest on each release.
+
 ### Claude Code
 
 ```bash
