@@ -5,6 +5,11 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.2.2]
+
+### Changed
+- README: clarified that the **API key is optional**. The server runs keyless for exploring docs, flows and guides; a key is only required to run live operations. Updated the prerequisites, install intro, and the environment-variables table accordingly.
+
 ## [0.2.1]
 
 ### Added

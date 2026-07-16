@@ -22,14 +22,19 @@ This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex,
 
 Full list: run `listTools` from any MCP client once connected, or see the [API reference](https://api-reference.avenia.io).
 
-## Prerequisites
+## Two ways to use it
 
-**Get your Avenia API key:**
+The server has two modes — and the first needs **no credentials**:
+
+- **Explore / learn to integrate (no API key):** install it and ask your assistant how to integrate. It reads Avenia's guides and step-by-step flows bundled in the server (and can fetch the platform public key). Perfect for a first look, with zero setup.
+- **Run live operations (with API key):** add an Avenia API key and the assistant can execute quotes, Pix, FX conversions, on-chain transfers, KYC, etc. Without a key, only these live tools are unavailable — the docs, flows and guides all still work.
+
+**Get an API key (only needed for live operations):**
 
 1. [Create an account on Avenia](https://app.avenia.io/sign-up)
 2. Complete KYC and pick your environment (sandbox or production)
-3. Open the dashboard, go to **Settings → API Keys**, and create a new key
-4. Copy the key — you won't be able to see it again
+3. Dashboard → **Settings → API Keys** → create a key
+4. Copy it — you won't see it again. Use a **sandbox** key while testing.
 
 **Dependencies:**
 
@@ -37,8 +42,7 @@ Full list: run `listTools` from any MCP client once connected, or see the [API r
 
 ## Installation
 
-No install step — your MCP client runs the server on demand with `npx`. All configs below use
-`npx -y @avenia-io/mcp-client`; set `AVENIA_API_KEY` and (optionally) `AVENIA_ENV` in the env.
+No install step — your MCP client runs the server on demand with `npx`. The configs below include an API key for live operations; **to only explore the docs and flows, just omit the `AVENIA_API_KEY` line** and the server runs keyless.
 
 ### Claude Desktop — one-click bundle (no terminal)
 
@@ -136,7 +140,7 @@ Then point your client at the built entrypoint: replace `npx -y @avenia-io/mcp-c
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `AVENIA_API_KEY` | ✓ | — | API key from the Avenia dashboard. Sent as `X-API-Key`. |
+| `AVENIA_API_KEY` | live ops only | — | API key from the Avenia dashboard. Sent as `X-API-Key`. Omit to run keyless (docs, flows & guides work; live tools return a "credential required" message). |
 | `AVENIA_BEARER_TOKEN` | alt. | — | Short-lived JWT from a login flow. Sent as `Authorization: Bearer`. |
 | `AVENIA_ENV` | | `sandbox` | `sandbox` or `production`. |
 | `AVENIA_API_BASE_URL` | | derived | Override the base URL (advanced). |
