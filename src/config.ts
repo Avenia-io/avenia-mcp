@@ -24,6 +24,16 @@ export interface Config {
   env: "sandbox" | "production" | "custom";
   timeoutMs: number;
   logLevel: LogLevel;
+  /** "stdio" (default, local) or "http" (remote Streamable HTTP server). */
+  transport: "stdio" | "http";
+  /** TCP port for the HTTP transport (from PORT / AVENIA_PORT). */
+  port: number;
+  /**
+   * In HTTP mode, expose only documentation (guides, flows, get_public_key) and
+   * hide the credential-bearing tools. Defaults to true — set AVENIA_HTTP_FULL=true
+   * only for a trusted, non-public HTTP deployment.
+   */
+  httpReadOnly: boolean;
 }
 
 export function loadConfig(): Config {
@@ -54,7 +64,12 @@ export function loadConfig(): Config {
   const logRaw = (readEnv("AVENIA_LOG_LEVEL") ?? "info").toLowerCase() as LogLevel;
   const logLevel: LogLevel = logRaw in LOG_LEVELS ? logRaw : "info";
 
-  return { apiKey, bearerToken, baseURL, env, timeoutMs, logLevel };
+  const transport = (readEnv("AVENIA_TRANSPORT") ?? "stdio").toLowerCase() === "http" ? "http" : "stdio";
+  const portRaw = readEnv("PORT") ?? readEnv("AVENIA_PORT");
+  const port = portRaw ? Math.max(1, Number(portRaw) || 8080) : 8080;
+  const httpReadOnly = (readEnv("AVENIA_HTTP_FULL") ?? "").toLowerCase() !== "true";
+
+  return { apiKey, bearerToken, baseURL, env, timeoutMs, logLevel, transport, port, httpReadOnly };
 }
 
 let cached: Config | undefined;
