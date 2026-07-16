@@ -18,8 +18,10 @@ export class AveniaApiError extends Error {
 export class MissingCredentialError extends Error {
   constructor() {
     super(
-      "No Avenia credential configured. Set AVENIA_API_KEY (generate at https://app.avenia.io) " +
-        "or AVENIA_BEARER_TOKEN (JWT from a login flow)."
+      "No Avenia credential configured. Set AVENIA_API_KEY or AVENIA_BEARER_TOKEN. " +
+        "API keys are created via the API behind MFA (not a dashboard) — use the " +
+        "`avenia_flow_create_api_key` prompt or read `avenia-guide://security-api-keys-management`. " +
+        "Accounts are provisioned by the Avenia team (no self-service sign-up)."
     );
     this.name = "MissingCredentialError";
   }
