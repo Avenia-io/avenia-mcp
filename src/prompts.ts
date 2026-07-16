@@ -169,6 +169,33 @@ Steps per \`avenia-guide://usecase-payout-brcode\`:
 3. Create the ticket (\`avenia_create_ticket\`) referencing the quote.
 4. Poll \`avenia_get_ticket_by_id\` until COMPLETED and fetch the receipt.`,
   },
+  {
+    name: "avenia_flow_create_api_key",
+    description:
+      "Guide the user through creating an Avenia API key. Keys are created via the API behind MFA — NOT in a dashboard.",
+    arguments: [
+      { name: "keyName", description: "A name for the API key (e.g. \"my-app-prod\"). Default: my-app." },
+    ],
+    guideIds: ["account-about-login", "account-login", "security-mfa", "security-api-keys-management", "security-api-keys-guide"],
+    template: `Guide the user through creating an Avenia API key named "{{keyName|my-app}}".
+
+Set expectations first:
+- Avenia accounts are **provisioned by the Avenia team** — there is NO self-service sign-up. If the user has no account yet, tell them to contact their Avenia representative / sales; you cannot create one.
+- API keys are **NOT created in a dashboard**. They are created via the API, behind MFA. This MCP intentionally has no tools for the auth/MFA/key-creation endpoints, so WALK THE USER THROUGH the requests — they run them (curl, an HTTP client, or code) and supply their own password, e-mail tokens and OTP. NEVER ask the user to paste their password to you.
+- The key is issued encrypted to a public key the user provides (JWE): the user generates an RSA key pair locally, submits the PUBLIC key, and decrypts the returned key material with their PRIVATE key. See \`avenia-guide://security-api-keys-management\` for the exact JWE handling.
+
+Base URL: production \`https://api.avenia.io:8443/v2\`, sandbox \`https://api.sandbox.avenia.io:10952/v2\`.
+
+Steps:
+1. **Generate an RSA key pair** locally, e.g. \`openssl genrsa -out avenia_private.pem 2048 && openssl rsa -in avenia_private.pem -pubout -out avenia_public.pem\`. Keep the private key secret.
+2. **Login:** \`POST /auth/login\` with \`{ email, password }\` — this e-mails a login token.
+3. **Validate login:** \`POST /auth/validate-login\` with \`{ email, emailToken }\` → returns \`accessToken\` (use as \`Authorization: Bearer\` on the next calls).
+4. **Enable MFA** (first time only): \`POST /auth/mfa/totp/create\` (Bearer) → returns a TOTP \`secret\`/QR; add it to an authenticator app. Then \`POST /auth/mfa/totp/validate\` (Bearer) with \`{ otp (from the app), emailToken (e-mailed when TOTP was created) }\` to activate.
+5. **Create the key:** \`POST /auth/api-keys/\` (Bearer) with \`{ otp (current TOTP), name, publicKey (PEM with newlines escaped as \\n) }\`. The response carries the key material encrypted to your public key — decrypt it with your private key.
+6. **Verify:** \`GET /auth/api-keys/\` (Bearer) lists your keys; delete with \`DELETE /auth/api-keys/{id}?otp=<current TOTP>\`.
+
+When done, tell the user to set the decrypted key as \`AVENIA_API_KEY\` in this MCP's config (use a **sandbox** key while testing). Cross-reference \`avenia-guide://security-mfa\` and \`avenia-guide://account-login\`.`,
+  },
 ];
 
 export const PROMPT_BY_NAME = new Map<string, PromptDescriptor>(PROMPTS.map((p) => [p.name, p]));

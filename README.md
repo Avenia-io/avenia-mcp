@@ -29,12 +29,11 @@ The server has two modes — and the first needs **no credentials**:
 - **Explore / learn to integrate (no API key):** install it and ask your assistant how to integrate. It reads Avenia's guides and step-by-step flows bundled in the server (and can fetch the platform public key). Perfect for a first look, with zero setup.
 - **Run live operations (with API key):** add an Avenia API key and the assistant can execute quotes, Pix, FX conversions, on-chain transfers, KYC, etc. Without a key, only these live tools are unavailable — the docs, flows and guides all still work.
 
-**Get an API key (only needed for live operations):**
+**Accounts & API keys (only needed for live operations):**
 
-1. [Create an account on Avenia](https://app.avenia.io/sign-up)
-2. Complete KYC and pick your environment (sandbox or production)
-3. Dashboard → **Settings → API Keys** → create a key
-4. Copy it — you won't see it again. Use a **sandbox** key while testing.
+Avenia accounts are **provisioned by the Avenia team** — there is no self-service sign-up. Contact your Avenia representative to get set up.
+
+API keys are **not** created in a dashboard. You create them via the API, behind MFA: log in → enable MFA → create a key with your own RSA public key (the key is returned encrypted to you, then you decrypt it locally). The easiest path is to let your AI assistant walk you through it — connect the MCP (it works keyless) and run the **`/avenia_flow_create_api_key`** prompt. Reference: the [Integration Guide](https://integration-guide.avenia.io) (API Keys / MFA sections). Use a **sandbox** key while testing.
 
 **Dependencies:**
 
@@ -179,7 +178,7 @@ Beyond the 66 tools, the server exposes two more MCP primitives so assistants ca
 
 ### Prompts (ready-made flows)
 
-Eight curated prompts map the most common integrations to a step-by-step plan. In Claude Code, Claude Desktop and Cursor these appear as slash commands (e.g. `/avenia_flow_pix_to_stablecoin_onchain`). Each takes typed arguments and returns a message the assistant can execute directly.
+Nine curated prompts map the most common integrations to a step-by-step plan. In Claude Code, Claude Desktop and Cursor these appear as slash commands (e.g. `/avenia_flow_pix_to_stablecoin_onchain`). Each takes typed arguments and returns a message the assistant can execute directly.
 
 | Prompt | What it does |
 |---|---|
@@ -191,6 +190,7 @@ Eight curated prompts map the most common integrations to a step-by-step plan. I
 | `avenia_flow_sandbox_mock_funds` | Credit mock Pix funds in sandbox for testing |
 | `avenia_flow_create_subaccount_with_kyc` | Create a sub-account and run KYC/KYB on it |
 | `avenia_flow_payout_brcode` | Pay a dynamic Pix BR Code (copia-e-cola) |
+| `avenia_flow_create_api_key` | Guide creating an API key (login → MFA → create key; not a dashboard) |
 
 ### Resources (integration-guide docs)
 

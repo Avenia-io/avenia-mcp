@@ -7,8 +7,12 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [0.2.2]
 
+### Added
+- New prompt **`avenia_flow_create_api_key`** that guides the real API-key creation flow (login → validate → MFA/TOTP → create key with your RSA public key). Keys are created via the API behind MFA — not a dashboard.
+
 ### Changed
-- README: clarified that the **API key is optional**. The server runs keyless for exploring docs, flows and guides; a key is only required to run live operations. Updated the prerequisites, install intro, and the environment-variables table accordingly.
+- README: clarified that the **API key is optional** (keyless explore mode), and corrected how accounts and keys are obtained — accounts are provisioned by the Avenia team (no self-service sign-up), and keys are created via the API behind MFA, not a dashboard. Updated prerequisites, install intro, and the environment-variables table.
+- Corrected the `MissingCredentialError` message and the server instructions, which previously implied keys are created in the dashboard.
 
 ## [0.2.1]
 
