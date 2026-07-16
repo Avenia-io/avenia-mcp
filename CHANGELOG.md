@@ -5,6 +5,14 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Added
+- **MCP Bundle (`.mcpb`)** for one-click install in Claude Desktop — the user opens the bundle and fills a config form (API key optional; environment defaults to sandbox). No terminal, no JSON, no Node install. Attached to the GitHub release. Note: `.mcpb` bundles do not auto-update — grab the latest on each release.
+
+### Changed
+- Strengthened the server-instructions guardrail: it now states up front that `docs.avenia.io` does not exist and that assistants must use `api-reference.avenia.io` / read the `avenia-guide://` resources instead of web-fetching Avenia URLs.
+
 ## [0.2.0]
 
 First public npm release.

@@ -1,0 +1,50 @@
+{
+  "manifest_version": "0.2",
+  "name": "avenia-mcp",
+  "display_name": "Avenia",
+  "version": "0.2.1",
+  "description": "Official MCP server for the Avenia public API — quotes, Pix pay-ins/pay-outs, FX conversions, on-chain stablecoin transfers, KYC, beneficiaries and webhooks.",
+  "long_description": "Connects your AI assistant to the Avenia platform. Ask in natural language and the assistant runs the integration for you. Leave the API key blank to browse the docs and integration flows without credentials; add a sandbox key to run live operations (no real money).",
+  "author": {
+    "name": "Avenia",
+    "url": "https://avenia.io"
+  },
+  "homepage": "https://api-reference.avenia.io",
+  "documentation": "https://integration-guide.avenia.io",
+  "support": "mailto:developers@avenia.io",
+  "license": "MIT",
+  "keywords": ["avenia", "payments", "pix", "stablecoin", "fintech", "fx"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "AVENIA_API_KEY": "${user_config.api_key}",
+        "AVENIA_ENV": "${user_config.env}"
+      }
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "Avenia API Key",
+      "description": "From app.avenia.io → Settings → API Keys. Optional: leave blank to browse docs and flows without credentials; add it to run live operations.",
+      "sensitive": true,
+      "required": false
+    },
+    "env": {
+      "type": "string",
+      "title": "Environment (sandbox or production)",
+      "description": "Use 'sandbox' for testing with no real money. Switch to 'production' only when you are ready.",
+      "default": "sandbox",
+      "required": false
+    }
+  },
+  "compatibility": {
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}
