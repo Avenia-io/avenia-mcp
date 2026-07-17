@@ -2,9 +2,9 @@
   "manifest_version": "0.2",
   "name": "avenia-mcp",
   "display_name": "Avenia",
-  "version": "0.3.1",
-  "description": "Official MCP server for the Avenia public API — quotes, Pix pay-ins/pay-outs, FX conversions, on-chain stablecoin transfers, KYC, beneficiaries and webhooks.",
-  "long_description": "Connects your AI assistant to the Avenia platform. Ask in natural language and the assistant runs the integration for you. Leave the API key blank to browse the docs and integration flows without credentials; add a sandbox key to run live operations (no real money).",
+  "version": "0.4.0",
+  "description": "Up-to-date Avenia APIs, docs, and integration flows — Pix, FX conversions, on-chain stablecoins, KYC and webhooks for your AI assistant.",
+  "long_description": "Connect your AI assistant to Avenia's developer platform — borderless payments infrastructure linking Latin America to the world. This server gives AI agents live access to Avenia's integration guides, ready-made flows, endpoint specs with request schemas, and authentication guidance (API keys with JWE, MFA/TOTP, webhook signature verification). Agents can discover services, retrieve the right guide, and generate accurate integration code without relying on stale training data. Leave the API key blank to explore the docs; add a sandbox key to run live operations (no real money).",
   "author": {
     "name": "Avenia",
     "url": "https://avenia.io"

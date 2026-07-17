@@ -5,6 +5,14 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.4.0]
+
+### Added
+- **Endpoint catalog tools** — `avenia_list_endpoints` and `avenia_describe_endpoint` expose every public API endpoint's spec (HTTP method, path, path/query params, request schema, auth requirement, base URLs) as read-only data. Agents can discover services and generate accurate integration code from live specs — without executing anything. Available on all transports, including the public endpoint (execution still requires a local install with an API key).
+
+### Changed
+- Repositioned the docs copy (manifest, README, server instructions) around "up-to-date Avenia APIs, docs, and integration guides for AI agents": discover services, retrieve guides, generate accurate code without stale training data. README now documents the hosted `mcp.avenia.io` endpoint as the zero-install option.
+
 ## [0.3.1]
 
 ### Added

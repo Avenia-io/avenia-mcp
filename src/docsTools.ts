@@ -2,6 +2,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { GUIDES, GUIDE_BY_ID } from "./guides.js";
 import { readGuide } from "./resources.js";
 import { PROMPTS, PROMPT_BY_NAME, renderPromptBody, guideResourceLinks } from "./prompts.js";
+import { TOOLS } from "./tools.js";
 
 /**
  * Read-only "docs" tools. The guides and flows are also exposed as MCP resources
@@ -98,5 +99,71 @@ export const DOCS_TOOLS: DocsTool[] = [
     },
   },
 ];
+
+const API_TOOL_BY_NAME = new Map(TOOLS.map((t) => [t.name, t]));
+
+// Endpoint-catalog tools: expose the API surface as *specs* (method, path,
+// params, request schema) so agents can discover services and generate accurate
+// integration code — without executing anything. Execution stays behind the
+// locally-installed server with the user's own API key.
+DOCS_TOOLS.push(
+  {
+    name: "avenia_list_endpoints",
+    title: "List Avenia API endpoints",
+    description:
+      "List every Avenia public API endpoint (name, HTTP method, path, summary, whether it needs credentials). Then call avenia_describe_endpoint with a name for its full request spec. Read-only — nothing is executed.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    handler: () =>
+      ok(
+        TOOLS.map((t) => ({
+          name: t.name,
+          method: t.method,
+          path: t.pathTemplate,
+          summary: t.description,
+          authRequired: !t.skipAuth,
+        }))
+      ),
+  },
+  {
+    name: "avenia_describe_endpoint",
+    title: "Describe an Avenia API endpoint",
+    description:
+      "Get the spec of one Avenia endpoint by name (from avenia_list_endpoints): HTTP method, path, path/query parameters and the JSON request schema — enough to generate correct integration code. Read-only, does NOT call the API. For response shapes and error codes, read the matching guide (avenia_read_guide) or api-reference.avenia.io.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: 'Endpoint/tool name, e.g. "avenia_get_fixed_rate_quote" (from avenia_list_endpoints).',
+        },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+    handler: (args) => {
+      const name = String(args.name ?? "").trim();
+      const t = API_TOOL_BY_NAME.get(name);
+      if (!t) return fail(`Unknown endpoint "${name}". Call avenia_list_endpoints for valid names.`);
+      return ok({
+        name: t.name,
+        summary: t.description,
+        method: t.method,
+        path: t.pathTemplate,
+        pathParams: t.pathParams,
+        queryParams: t.queryParams,
+        authRequired: !t.skipAuth,
+        auth: t.skipAuth ? "none" : "X-API-Key header (or Authorization: Bearer)",
+        baseUrls: {
+          sandbox: "https://api.sandbox.avenia.io:10952/v2",
+          production: "https://api.avenia.io:8443/v2",
+        },
+        requestSchema: t.inputSchema,
+        note:
+          "Schema shown is the tool input: path/query params plus `body` (the JSON request body) where applicable. " +
+          "Response shapes & error codes: see api-reference.avenia.io or the guides.",
+      });
+    },
+  }
+);
 
 export const DOCS_TOOL_BY_NAME = new Map<string, DocsTool>(DOCS_TOOLS.map((t) => [t.name, t]));
