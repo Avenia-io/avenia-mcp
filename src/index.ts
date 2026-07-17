@@ -99,11 +99,12 @@ function buildInstructions(cfg: ReturnType<typeof config>, publicReadOnly = fals
 
   if (publicReadOnly) {
     lines.push(
-      `This is the PUBLIC read-only endpoint (mcp.avenia.io). It serves documentation only: the ${listGuideResources().length} \`avenia-guide://*\` resources, the ${PROMPTS.length} \`/avenia_flow_*\` prompts, and \`avenia_get_public_key\`. Live API operations (quotes, Pix, conversions, KYC, beneficiaries, webhooks, …) are NOT available here. To run them, install the MCP locally with your own API key: \`npx -y @avenia-io/mcp-client\` (your key stays on your machine).`,
+      `This is the PUBLIC read-only endpoint (mcp.avenia.io): up-to-date Avenia docs, endpoint specs and integration flows for AI agents — discover services, retrieve guides, and generate accurate integration code without stale training data. Live API operations (quotes, Pix, conversions, KYC, beneficiaries, webhooks, …) are NOT executable here. To run them, install the MCP locally with your own API key: \`npx -y @avenia-io/mcp-client\` (your key stays on your machine).`,
       ``,
       `How to use this MCP:`,
-      `1. CONCEPTS / FLOWS / PAYLOADS → read \`avenia-guide://*\` resources (\`resources/list\` for all ${listGuideResources().length}). Do NOT WebFetch Avenia URLs — read the resource instead.`,
-      `2. INTEGRATION WALKTHROUGHS → the ${PROMPTS.length} \`/avenia_flow_*\` prompts encode the canonical step-by-step, including \`/avenia_flow_create_api_key\` for obtaining a key. Accounts are provisioned by the Avenia team (no self-service sign-up).`,
+      `1. CONCEPTS / FLOWS / PAYLOADS → \`avenia_list_guides\` + \`avenia_read_guide\` (${listGuideResources().length} guides, also exposed as \`avenia-guide://*\` resources). Do NOT WebFetch Avenia URLs — read the guide instead.`,
+      `2. INTEGRATION WALKTHROUGHS → \`avenia_list_flows\` + \`avenia_get_flow\` (${PROMPTS.length} flows, also exposed as \`/avenia_flow_*\` prompts), including \`avenia_flow_create_api_key\` for obtaining a key. Accounts are provisioned by the Avenia team (no self-service sign-up).`,
+      `3. CODE GENERATION → \`avenia_list_endpoints\` + \`avenia_describe_endpoint\` give every endpoint's method, path, params and request schema. Compose these specs with the guides to write correct integration code.`,
     );
   } else {
     lines.push(

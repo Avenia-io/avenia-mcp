@@ -4,13 +4,15 @@
 [![docs](https://img.shields.io/badge/docs-api--reference.avenia.io-0a0a0a)](https://api-reference.avenia.io)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless liquidity infrastructure connecting LatAm to the world.
+**Up-to-date Avenia APIs, docs, and integration guides for AI agents.**
 
-> Install with a single `npx` command — no clone or build step. Defaults to **sandbox**; switch to production only when you're ready.
+The official [Model Context Protocol](https://modelcontextprotocol.io/) server for [Avenia](https://avenia.io) — borderless payments infrastructure linking Latin America to the world. It gives AI agents live access to Avenia's integration guides, ready-made flows, endpoint specs with request schemas, and authentication guidance — so they can discover services, retrieve the right guide, and generate accurate integration code without relying on stale training data.
+
+> Zero-setup: add the hosted endpoint **`https://mcp.avenia.io/mcp`** as a remote connector (docs & specs, no credentials). Or install locally with a single `npx` command to run live operations — defaults to **sandbox**.
 
 ## What This MCP Server Does
 
-This MCP server plugs AI assistants (Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 66 tools — one per public API endpoint — that let an assistant:
+This MCP server plugs AI assistants (claude.ai, Cursor, Claude Code, Claude Desktop, Codex, Zed, and any other MCP-compatible client) directly into the Avenia platform. It exposes 66 API tools — one per public API endpoint — plus 6 documentation tools (list/read guides, list/get flows, list/describe endpoints) that let an assistant:
 
 - Create and manage **sub-accounts** and **accesses** for your organization
 - Move money via **tickets**: Pix pay-ins, PIX / wire pay-outs, FX conversions, and on-chain stablecoin transfers
@@ -41,7 +43,11 @@ API keys are **not** created in a dashboard. You create them via the API, behind
 
 ## Installation
 
-No install step — your MCP client runs the server on demand with `npx`. The configs below include an API key for live operations; **to only explore the docs and flows, just omit the `AVENIA_API_KEY` line** and the server runs keyless.
+### Hosted endpoint — zero install (docs & specs only)
+
+Add **`https://mcp.avenia.io/mcp`** as a remote MCP connector (claude.ai → Settings → Connectors, or any client that supports Streamable HTTP). No install, no credentials — the assistant gets the guides, flows and endpoint specs to answer questions and generate integration code. Live operations are not executable on this endpoint; install locally (below) for those.
+
+No local install step either — your MCP client runs the server on demand with `npx`. The configs below include an API key for live operations; **to only explore the docs and flows, just omit the `AVENIA_API_KEY` line** and the server runs keyless.
 
 ### Claude Desktop — one-click bundle (no terminal)
 
