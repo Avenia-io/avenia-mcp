@@ -43,9 +43,33 @@ API keys are **not** created in a dashboard. You create them via the API, behind
 
 ## Installation
 
-### Hosted endpoint — zero install (docs & specs only)
+### Connect the Avenia MCP to Claude (remote connector, no API key)
 
-Add **`https://mcp.avenia.io/mcp`** as a remote MCP connector (claude.ai → Settings → Connectors, or any client that supports Streamable HTTP). No install, no credentials — the assistant gets the guides, flows and endpoint specs to answer questions and generate integration code. Live operations are not executable on this endpoint; install locally (below) for those.
+Avenia's documentation connector gives Claude live access to the API guides, integration flows and endpoint specs, right in the conversation. It is **read-only and asks for no credentials** — nothing in your account is accessed.
+
+Connector URL: **`https://mcp.avenia.io/mcp`**
+
+On Claude (Free, Pro and Max plans — web, desktop app or Cowork):
+
+1. Open Claude and go to **Settings → Connectors** (or **Customize → Connectors**)
+2. Click **Add custom connector**
+3. Paste `https://mcp.avenia.io/mcp` and confirm (no OAuth fields needed)
+4. Done — Avenia's documentation tools are available to Claude
+
+On **Claude Team/Enterprise**, only an Owner/admin can enable connectors for the org (organization settings → Add custom connector, same URL); members then see it automatically. Any other MCP client that supports the Streamable HTTP transport works too.
+
+Need live operations, not just docs? Use the local install below — your API key never leaves your machine.
+
+<details>
+<summary><strong>Em português</strong></summary>
+
+O conector de documentação da Avenia dá ao Claude acesso em tempo real aos guias de API, fluxos de integração e especificações de endpoints, direto na conversa. É **somente-leitura e não pede nenhuma credencial**.
+
+URL do conector: `https://mcp.avenia.io/mcp`
+
+No Claude (planos Free, Pro e Max): abra **Settings → Connectors** (ou **Customize → Connectors**) → **Add custom connector** → cole a URL e confirme. No Claude Team/Enterprise, só o Owner/admin habilita conectores para a organização. Precisa das operações ao vivo, não só docs? Use o pacote local (`npx -y @avenia-io/mcp-client` ou o `.mcpb` no Claude Desktop), onde a API key nunca sai da sua máquina.
+
+</details>
 
 No local install step either — your MCP client runs the server on demand with `npx`. The configs below include an API key for live operations; **to only explore the docs and flows, just omit the `AVENIA_API_KEY` line** and the server runs keyless.
 
