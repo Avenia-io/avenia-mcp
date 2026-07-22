@@ -60,6 +60,8 @@ On **Claude Team/Enterprise**, only an Owner/admin can enable connectors for the
 
 Need live operations, not just docs? Use the local install below — your API key never leaves your machine.
 
+Privacy: the hosted connector is read-only and credential-free — see the [privacy policy](https://mcp.avenia.io/privacy).
+
 <details>
 <summary><strong>Em português</strong></summary>
 
