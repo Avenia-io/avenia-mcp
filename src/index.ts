@@ -28,6 +28,7 @@ import {
 } from "./prompts.js";
 import { TOOLS, type ToolDefinition } from "./tools.js";
 import { DOCS_TOOLS, DOCS_TOOL_BY_NAME } from "./docsTools.js";
+import { PRIVACY_HTML } from "./privacy.js";
 import { SERVER_NAME as PKG_NAME, VERSION as PKG_VERSION } from "./version.js";
 
 const TOOL_BY_NAME = new Map<string, ToolDefinition>(TOOLS.map((t) => [t.name, t]));
@@ -159,8 +160,12 @@ function createMcpServer(cfg: ReturnType<typeof config>, publicReadOnly: boolean
         name: t.name,
         description: t.description,
         inputSchema: t.inputSchema,
-        // On the public endpoint only read-only API tools (get_public_key) are visible.
-        ...(publicReadOnly ? { annotations: { readOnlyHint: true } } : {}),
+        // Every tool carries a title annotation (Connectors Directory requirement).
+        // On the public endpoint only read-only API tools (get_public_key) are
+        // visible, and they are additionally marked readOnlyHint.
+        annotations: publicReadOnly
+          ? { title: t.description, readOnlyHint: true }
+          : { title: t.description },
       })),
     ],
   }));
@@ -299,6 +304,12 @@ async function startHttp(cfg: ReturnType<typeof config>): Promise<void> {
       return;
     }
     for (const [k, v] of Object.entries(CORS_HEADERS)) res.setHeader(k, v);
+
+    if (req.method === "GET" && url.pathname === "/privacy") {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(PRIVACY_HTML);
+      return;
+    }
 
     if (req.method === "GET" && url.pathname === "/health") {
       res.writeHead(200, { "content-type": "application/json" });

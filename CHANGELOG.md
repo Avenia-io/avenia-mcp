@@ -5,6 +5,14 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.4.1]
+
+### Added
+- **Privacy policy** served at `GET /privacy` on the hosted endpoint (mcp.avenia.io/privacy) and linked from the README — Connectors Directory requirement.
+
+### Changed
+- Every exposed tool now carries a `title` annotation (docs tools already did; API tools now derive it from their summary). On the public endpoint all tools are additionally `readOnlyHint: true` — Connectors Directory requirement.
+
 ## [0.4.0]
 
 ### Added
