@@ -5,7 +5,7 @@
 Please report security issues **privately**. Do not open a public GitHub issue for a
 vulnerability.
 
-- Email: **security@avenia.io** (or **developers@avenia.io**)
+- Email: **tech@avenia.io**
 
 Include a description, reproduction steps, and impact. We aim to acknowledge reports within a
 few business days.

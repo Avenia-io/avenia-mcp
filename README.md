@@ -246,7 +246,7 @@ Representative guides (see `resources/list` for the full catalog):
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/Avenia-io/avenia-mcp/issues)
-- **Email**: [developers@avenia.io](mailto:developers@avenia.io)
+- **Email**: [tech@avenia.io](mailto:tech@avenia.io)
 - **Status**: [status.avenia.io](https://status.avenia.io)
 
 ## License

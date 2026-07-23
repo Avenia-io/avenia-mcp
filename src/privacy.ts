@@ -65,9 +65,8 @@ Avenia API — never through this hosted endpoint. Avenia's platform-level proce
 governed by your agreement with Avenia.</p>
 
 <h2>Your choices &amp; contact</h2>
-<p>You can disconnect the connector at any time in your AI client's settings. Questions or requests:
-<a href="mailto:developers@avenia.io">developers@avenia.io</a>. Security reports:
-<a href="mailto:security@avenia.io">security@avenia.io</a>.</p>
+<p>You can disconnect the connector at any time in your AI client's settings. Questions, requests and
+security reports: <a href="mailto:tech@avenia.io">tech@avenia.io</a>.</p>
 
 <h2>Changes</h2>
 <p>Updates to this policy are posted at this URL with a revised date above.</p>
