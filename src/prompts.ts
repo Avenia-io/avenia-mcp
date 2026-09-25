@@ -196,6 +196,103 @@ Steps:
 
 When done, tell the user to set the decrypted key as \`AVENIA_API_KEY\` in this MCP's config (use a **sandbox** key while testing). Cross-reference \`avenia-guide://security-mfa\` and \`avenia-guide://account-login\`.`,
   },
+  {
+    name: "avenia_flow_payout_integration",
+    description:
+      "Build a stablecoin→BRL payout integration end to end (quote → ticket → settlement), with idempotency and webhook confirmation.",
+    arguments: [
+      { name: "language", description: "Target language/stack (e.g. TypeScript/Node, Python, Go). Default: TypeScript." },
+      { name: "inputCurrency", description: "Stablecoin funding the payout (USDC, USDT, BRLA). Default: USDC." },
+    ],
+    guideIds: ["usecase-payout-brcode", "operations-quotes-and-tickets", "webhooks-management"],
+    template: `Implement a production-grade **{{inputCurrency|USDC}} → BRL (PIX) payout** integration in {{language|TypeScript}} against the Avenia API.
+
+Design and generate code for:
+1. **Beneficiary**: create/reuse a BRL beneficiary (PIX key or full bank account); validate it before payout.
+2. **Quote**: \`GET /v2/account/quote/fixed-rate\` (inputCurrency={{inputCurrency|USDC}}, inputPaymentMethod=INTERNAL, outputCurrency=BRL, outputPaymentMethod=PIX, blockchainSendMethod=PERMIT). Treat the quote as short-lived (~15s) — quote and create the ticket in one server-side step, never across a user round-trip.
+3. **Ticket**: \`POST /v2/account/tickets\` with the \`quoteToken\`. Use your own \`externalId\` for **idempotency** so retries never double-pay; before creating, check \`GET /v2/account/tickets?externalId=…\`.
+4. **Settlement**: don't block on the response — confirm via webhook (subscription TICKET) or poll \`GET /v2/account/tickets/{id}\` until a terminal status (PAID / FAILED / PARTIAL-FAILED / CANCELED).
+5. **Errors**: surface \`failureReason\`; handle quote-expired by re-quoting; treat PARTIAL-FAILED as tokens returned.
+
+Read \`avenia-guide://usecase-payout-brcode\` and \`avenia-guide://operations-quotes-and-tickets\` first; wire notifications per \`avenia-guide://webhooks-management\`.`,
+  },
+  {
+    name: "avenia_flow_onramp_integration",
+    description: "Build a PIX→stablecoin on-ramp integration: issue a PIX charge, then credit the stablecoin on payment.",
+    arguments: [
+      { name: "language", description: "Target language/stack. Default: TypeScript." },
+      { name: "outputCurrency", description: "Stablecoin to credit (USDC, USDT, BRLA). Default: USDC." },
+    ],
+    guideIds: ["usecase-pix2stable-onchain", "operations-quotes-and-tickets"],
+    template: `Implement a **BRL (PIX) → {{outputCurrency|USDC}}** on-ramp in {{language|TypeScript}}.
+
+1. **Quote** \`GET /v2/account/quote/fixed-rate\` (inputCurrency=BRL, inputPaymentMethod=PIX, outputCurrency={{outputCurrency|USDC}}, outputPaymentMethod=INTERNAL). Provide inputAmount (BRL to pay) OR outputAmount (exact stablecoin).
+2. **Ticket** \`POST /v2/account/tickets\` with the quoteToken (idempotent via your own externalId). The response carries the PIX charge (brCode / copia-e-cola / QR) — render it for the payer.
+3. **Credit**: on the TICKET webhook (or poll \`GET /v2/account/tickets/{id}\`), when the payer pays and the ticket reaches PAID, the stablecoin is credited.
+4. Handle charge expiry and re-issue; reconcile by externalId.
+
+Read \`avenia-guide://usecase-pix2stable-onchain\` and \`avenia-guide://operations-quotes-and-tickets\`.`,
+  },
+  {
+    name: "avenia_flow_reconciliation_ledger",
+    description: "Build a daily reconciliation job that compares your own ledger against Avenia ticket statuses and flags drift.",
+    arguments: [{ name: "language", description: "Target language/stack. Default: TypeScript." }],
+    guideIds: ["operations-quotes-and-tickets", "webhooks-events"],
+    template: `Build a **reconciliation ledger** job in {{language|TypeScript}} that keeps your records in sync with Avenia.
+
+1. Pull tickets for the window with \`GET /v2/account/tickets\` (paginate via \`cursor\`; filter by \`createdAfter\`/\`createdBefore\`, \`status\`).
+2. Join to your DB by \`externalId\` (the idempotency key you set at creation). For each: compare your stored status/amounts vs Avenia's \`status\` + \`quote\` amounts.
+3. Classify: matched, missing-locally (webhook lost), missing-remotely (created but no ticket), status-drift, amount-drift.
+4. For terminal Avenia states (PAID/FAILED/PARTIAL-FAILED/CANCELED) update your ledger; alert on drift; make the job idempotent + safe to re-run.
+5. Backfill from webhook history with \`GET /v2/notifications/webhooks/events?dataId=<ticketId>\` when a live event was missed.
+
+Read \`avenia-guide://operations-quotes-and-tickets\` and \`avenia-guide://webhooks-events\`.`,
+  },
+  {
+    name: "avenia_flow_webhook_debug",
+    description: "Diagnose webhook delivery failures and verify the RSA Signature over the raw body.",
+    arguments: [],
+    guideIds: ["webhooks-management", "webhooks-events", "webhooks-verifying-authenticity"],
+    template: `Diagnose and harden Avenia **webhook** delivery + authenticity.
+
+1. **Registration**: confirm the endpoint with \`GET /v2/notifications/webhooks\` — right \`webhookUrl\`, subscription \`TICKET\` (money movement is all TICKET; there is no WITHDRAW/DEPOSIT). Max 3 webhooks.
+2. **Delivery**: inspect attempts with \`GET /v2/notifications/webhooks/attempts\` (\`unackedOnly\`, \`webhookEventId\`) — look at \`responseStatus\`; your endpoint must return 2xx quickly or Avenia retries.
+3. **Signature**: every POST carries a \`Signature\` header = base64 RSA signature over the **raw** request body. Verify with **RSA-PSS**, MGF1(SHA-256), saltLength MAX, digest SHA-256, using the public key from \`GET /v2/public-key\` (\`avenia_get_public_key\`; it ROTATES — fetch + cache, don't hardcode). Common bug: verifying over the parsed/re-serialized body instead of the raw bytes.
+4. **Replay/idempotency**: dedupe by event \`id\`; use \`event.data.ticket.id\` + \`event.data.type\` (TICKET-COMPLETE is the terminal step).
+
+Read \`avenia-guide://webhooks-verifying-authenticity\` (has the exact verification recipe), \`avenia-guide://webhooks-events\`, \`avenia-guide://webhooks-management\`.`,
+  },
+  {
+    name: "avenia_flow_integration_audit",
+    description: "Audit an existing Avenia integration for production readiness (quote handling, idempotency, webhook security, error paths).",
+    arguments: [],
+    guideIds: ["operations-quotes-and-tickets", "webhooks-verifying-authenticity"],
+    template: `Run a **production-readiness audit** of my Avenia integration. Review the code and report findings + fixes, checking:
+
+1. **Quotes**: is the ~15s quote window respected (quote→ticket server-side, no user round-trip)? Any place a stale quoteToken can be reused?
+2. **Idempotency**: is a stable \`externalId\` set on every ticket, and checked (\`GET /v2/account/tickets?externalId=\`) before create so retries can't double-move money?
+3. **Settlement**: does it wait for a TERMINAL status (PAID/FAILED/PARTIAL-FAILED/CANCELED) rather than assuming success from the create response? Is PARTIAL-FAILED handled?
+4. **Webhook security**: is the \`Signature\` verified with RSA-PSS over the raw body using the live \`/v2/public-key\`? Are events deduped?
+5. **Secrets/keys**: API key scoping (sandbox vs production), never logged; no secrets in the client.
+6. **Errors**: are \`failureReason\` and API errors surfaced and retried sensibly (backoff, not on 4xx)?
+
+Cite the guides \`avenia-guide://operations-quotes-and-tickets\` and \`avenia-guide://webhooks-verifying-authenticity\`. Output a prioritized checklist with file/line references and concrete diffs.`,
+  },
+  {
+    name: "avenia_flow_sandbox_quickstart",
+    description: "Get from zero to a first completed ticket in sandbox: key, KYC, mock funds, one quote→ticket.",
+    arguments: [],
+    guideIds: ["operations-quotes-and-tickets", "usecase-pix2stable-stable2pix"],
+    template: `Walk me from zero to a first completed transaction in **sandbox**.
+
+1. Confirm the env is sandbox and a key is set (\`AVENIA_API_KEY\`); check access with \`avenia_get_access_info\`.
+2. Clear KYC for the test account (use the \`/avenia_flow_kyc_level_1\` prompt if needed).
+3. Fund the sandbox account with mock funds (use the \`/avenia_flow_sandbox_mock_funds\` prompt).
+4. Do one small quote→ticket (e.g. a conversion or a payout): \`avenia_get_fixed_rate_quote\` → \`avenia_create_ticket\` → \`avenia_get_ticket_by_id\` until terminal.
+5. Register a webhook (\`/avenia_flow_register_webhook\`) and confirm you receive the TICKET event.
+
+Read \`avenia-guide://operations-quotes-and-tickets\`. Keep everything on sandbox keys until it works end to end.`,
+  },
 ];
 
 export const PROMPT_BY_NAME = new Map<string, PromptDescriptor>(PROMPTS.map((p) => [p.name, p]));
